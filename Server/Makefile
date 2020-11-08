@@ -13,10 +13,15 @@ RMIInterface.jar: Server/Interface/IResourceManager.java
 	javac Server/Interface/IResourceManager.java
 	jar cvf RMIInterface.jar Server/Interface/IResourceManager.class
 
-compile-server-rmi: Server/RMI/*.java Server/Interface/IResourceManager.java Server/Common/*.java Server/LockManager/*.java
-	javac Server/RMI/*.java Server/Interface/IResourceManager.java Server/Common/*.java Server/LockManager/*.java
+MyExceptions.jar: Server/TransactionManager/TransactionAbortedException.java Server/TransactionManager/InvalidTransactionException.java
+	@echo "Compiling transaction manager exceptions"
+	javac Server/TransactionManager/TransactionAbortedException.java Server/TransactionManager/InvalidTransactionException.java
+	jar cvf MyExceptions.jar Server/TransactionManager/TransactionAbortedException.class Server/TransactionManager/InvalidTransactionException.class
+
+compile-server-rmi: Server/RMI/*.java Server/Interface/IResourceManager.java Server/Common/*.java Server/LockManager/*.java Server/TransactionManager/*.java
+	javac Server/RMI/*.java Server/Interface/IResourceManager.java Server/Common/*.java Server/LockManager/*.java Server/TransactionManager/*.java
 
 clean:
-	rm -f Server/Interface/*.class Server/Common/*.class Server/RMI/*.class Server/LockManager/*.class
+	rm -f Server/Interface/*.class Server/Common/*.class Server/RMI/*.class Server/LockManager/*.class Server/TransactionManager/*.class
 	rm -f RMIInterface.jar
 	rm -f java.policy 

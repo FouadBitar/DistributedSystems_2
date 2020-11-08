@@ -1,6 +1,8 @@
 package Client;
 
 import Server.Interface.*;
+import Server.TransactionManager.InvalidTransactionException;
+import Server.TransactionManager.TransactionAbortedException;
 
 import java.util.*;
 import java.io.*;
@@ -67,7 +69,7 @@ public abstract class Client
 		}
 	}
 
-	public void execute(Command cmd, Vector<String> arguments) throws RemoteException, NumberFormatException
+	public void execute(Command cmd, Vector<String> arguments) throws RemoteException, NumberFormatException, InvalidTransactionException, TransactionAbortedException
 	{
 		switch (cmd)
 		{
@@ -98,26 +100,85 @@ public abstract class Client
 
 				//open transaction
 				int xid = m_resourceManager.start();
-				if (m_resourceManager.addFlight(xid, flightNum, flightSeats, flightPrice)) {
+				
+
+				if(id == 0) {
+					
+					//perform operation
 					try {
-						if(m_resourceManager.commit(xid)) {
+						if (m_resourceManager.addFlight(xid, flightNum, flightSeats, flightPrice)) {
+							//operation successful, commit
+							m_resourceManager.commit(xid);
 							System.out.println("Flight added");
+						} 
+						else {
+							//could not add, abort the transaction
+							m_resourceManager.abort(xid);
+							System.out.println("Flight could not be added, transaction was aborted");
 						}
 					} 
-					catch (TransactionAbortedException ea) {} 
-					catch (InvalidTransactionException ei) {}
+					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+					
+					break;
+				} else if(id == 1) {
+					//test to see if multiple transactions can read at the same time
+					int xid1 = m_resourceManager.start();
+					int xid2 = m_resourceManager.start();
+					int xid3 = m_resourceManager.start();
+
+					//perform operation
+					try {
+						m_resourceManager.addCars(xid1, "montreal", 50, 40);
+						m_resourceManager.commit(xid1);
+						int cars2 = m_resourceManager.queryCars(xid2, "montreal");
+						int cars3 = m_resourceManager.queryCars(xid3, "montreal");
+						System.out.println("Number of cars at this location: " + cars2);
+						System.out.println("Number of cars at this location: " + cars3);
+						m_resourceManager.commit(xid2);
+						m_resourceManager.commit(xid3);
+
+					} 
+					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+
+				} else if(id ==2) {
+					//test to see if multiple writes can take place - they should not be able to
+					//test to see if multiple transactions can read at the same time
+					int xid1 = m_resourceManager.start();
+					int xid2 = m_resourceManager.start();
+					int xid3 = m_resourceManager.start();
+
+					//perform operation
+					try {
+						m_resourceManager.addCars(xid1, "montreal", 50, 40);
+						m_resourceManager.addCars(xid2, "toronto", 60, 40);
+						int cars1 = m_resourceManager.queryCars(xid1, "montreal");
+						System.out.println("Number of cars at this location: " + cars1);
+
+						m_resourceManager.commit(xid1);
+						m_resourceManager.commit(xid2);
+
+					} 
+					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
 				} 
 				else {
-					//could not add, abort the transaction
-					try{
+					//perform operation
+					try {
+
+						
+						m_resourceManager.addFlight(xid, flightNum, flightSeats, flightPrice);
 						m_resourceManager.abort(xid);
 					} 
-					catch(InvalidTransactionException e) { System.out.println("Transaction id is invalid");}
+					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
 					
-					System.out.println("Flight could not be added");
+					break;
 				}
-				
 				break;
+				
 			}
 			case AddCars: {
 				checkArgumentsCount(5, arguments.size());
@@ -127,16 +188,30 @@ public abstract class Client
 				System.out.println("-Number of Cars: " + arguments.elementAt(3));
 				System.out.println("-Car Price: " + arguments.elementAt(4));
 
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 				int numCars = toInt(arguments.elementAt(3));
 				int price = toInt(arguments.elementAt(4));
 
-				if (m_resourceManager.addCars(id, location, numCars, price)) {
-					System.out.println("Cars added");
-				} else {
-					System.out.println("Cars could not be added");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.addCars(xid, location, numCars, price)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Cars added");
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Cars could not be added");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case AddRooms: {
@@ -147,16 +222,30 @@ public abstract class Client
 				System.out.println("-Number of Rooms: " + arguments.elementAt(3));
 				System.out.println("-Room Price: " + arguments.elementAt(4));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 				int numRooms = toInt(arguments.elementAt(3));
 				int price = toInt(arguments.elementAt(4));
 
-				if (m_resourceManager.addRooms(id, location, numRooms, price)) {
-					System.out.println("Rooms added");
-				} else {
-					System.out.println("Rooms could not be added");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.addRooms(xid, location, numRooms, price)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Rooms added");
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Rooms could not be added");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case AddCustomer: {
@@ -164,10 +253,20 @@ public abstract class Client
 
 				System.out.println("Adding a new customer [xid=" + arguments.elementAt(1) + "]");
 
-				int id = toInt(arguments.elementAt(1));
-				int customer = m_resourceManager.newCustomer(id);
+				// int id = toInt(arguments.elementAt(1));
+				//open transaction
+				int xid = m_resourceManager.start();
 
-				System.out.println("Add customer ID: " + customer);
+				try {
+					int customer = m_resourceManager.newCustomer(xid);
+					
+					m_resourceManager.commit(xid);
+
+					System.out.println("Add customer ID: " + customer);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				
 				break;
 			}
 			case AddCustomerID: {
@@ -176,14 +275,28 @@ public abstract class Client
 				System.out.println("Adding a new customer [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Customer ID: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 
-				if (m_resourceManager.newCustomer(id, customerID)) {
-					System.out.println("Add customer ID: " + customerID);
-				} else {
-					System.out.println("Customer could not be added");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.newCustomer(xid, customerID)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Add customer ID: " + customerID);
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Customer could not be added");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case DeleteFlight: {
@@ -192,14 +305,28 @@ public abstract class Client
 				System.out.println("Deleting a flight [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Flight Number: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				int flightNum = toInt(arguments.elementAt(2));
 
-				if (m_resourceManager.deleteFlight(id, flightNum)) {
-					System.out.println("Flight Deleted");
-				} else {
-					System.out.println("Flight could not be deleted");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.deleteFlight(xid, flightNum)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Flight Deleted");
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Flight could not be deleted");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case DeleteCars: {
@@ -208,14 +335,28 @@ public abstract class Client
 				System.out.println("Deleting all cars at a particular location [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Car Location: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 
-				if (m_resourceManager.deleteCars(id, location)) {
-					System.out.println("Cars Deleted");
-				} else {
-					System.out.println("Cars could not be deleted");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.deleteCars(xid, location)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Cars Deleted");
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Cars could not be deleted");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case DeleteRooms: {
@@ -224,14 +365,28 @@ public abstract class Client
 				System.out.println("Deleting all rooms at a particular location [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Car Location: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 
-				if (m_resourceManager.deleteRooms(id, location)) {
-					System.out.println("Rooms Deleted");
-				} else {
-					System.out.println("Rooms could not be deleted");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.deleteRooms(xid, location)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Rooms Deleted");
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Rooms could not be deleted");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case DeleteCustomer: {
@@ -240,14 +395,28 @@ public abstract class Client
 				System.out.println("Deleting a customer from the database [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Customer ID: " + arguments.elementAt(2));
 				
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 
-				if (m_resourceManager.deleteCustomer(id, customerID)) {
-					System.out.println("Customer Deleted");
-				} else {
-					System.out.println("Customer could not be deleted");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.deleteCustomer(xid, customerID)) {
+						//operation successful, commit
+						m_resourceManager.commit(xid);
+						System.out.println("Customer Deleted");
+					} 
+					else {
+						//could not add, abort the transaction
+						m_resourceManager.abort(xid);
+						System.out.println("Customer could not be deleted");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case QueryFlight: {
@@ -256,11 +425,21 @@ public abstract class Client
 				System.out.println("Querying a flight [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Flight Number: " + arguments.elementAt(2));
 				
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				int flightNum = toInt(arguments.elementAt(2));
 
-				int seats = m_resourceManager.queryFlight(id, flightNum);
-				System.out.println("Number of seats available: " + seats);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					int seats = m_resourceManager.queryFlight(xid, flightNum);
+					System.out.println("Number of seats available: " + seats);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case QueryCars: {
@@ -269,11 +448,22 @@ public abstract class Client
 				System.out.println("Querying cars location [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Car Location: " + arguments.elementAt(2));
 				
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 
-				int numCars = m_resourceManager.queryCars(id, location);
-				System.out.println("Number of cars at this location: " + numCars);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					int numCars = m_resourceManager.queryCars(xid, location);
+					System.out.println("Number of cars at this location: " + numCars);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;
 			}
 			case QueryRooms: {
@@ -282,11 +472,22 @@ public abstract class Client
 				System.out.println("Querying rooms location [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Room Location: " + arguments.elementAt(2));
 				
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 
-				int numRoom = m_resourceManager.queryRooms(id, location);
-				System.out.println("Number of rooms at this location: " + numRoom);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					int numRoom = m_resourceManager.queryRooms(xid, location);
+					System.out.println("Number of rooms at this location: " + numRoom);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;
 			}
 			case QueryCustomer: {
@@ -295,11 +496,22 @@ public abstract class Client
 				System.out.println("Querying customer information [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Customer ID: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 
-				String bill = m_resourceManager.queryCustomerInfo(id, customerID);
-				System.out.print(bill);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					String bill = m_resourceManager.queryCustomerInfo(xid, customerID);
+					System.out.print(bill);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;               
 			}
 			case QueryFlightPrice: {
@@ -308,11 +520,22 @@ public abstract class Client
 				System.out.println("Querying a flight price [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Flight Number: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				//int id = toInt(arguments.elementAt(1));
 				int flightNum = toInt(arguments.elementAt(2));
 
-				int price = m_resourceManager.queryFlightPrice(id, flightNum);
-				System.out.println("Price of a seat: " + price);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					int price = m_resourceManager.queryFlightPrice(xid, flightNum);
+					System.out.println("Price of a seat: " + price);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;
 			}
 			case QueryCarsPrice: {
@@ -321,11 +544,22 @@ public abstract class Client
 				System.out.println("Querying cars price [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Car Location: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 
-				int price = m_resourceManager.queryCarsPrice(id, location);
-				System.out.println("Price of cars at this location: " + price);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					int price = m_resourceManager.queryCarsPrice(xid, location);
+					System.out.println("Price of cars at this location: " + price);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;
 			}
 			case QueryRoomsPrice: {
@@ -334,11 +568,22 @@ public abstract class Client
 				System.out.println("Querying rooms price [xid=" + arguments.elementAt(1) + "]");
 				System.out.println("-Room Location: " + arguments.elementAt(2));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				String location = arguments.elementAt(2);
 
-				int price = m_resourceManager.queryRoomsPrice(id, location);
-				System.out.println("Price of rooms at this location: " + price);
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					int price = m_resourceManager.queryRoomsPrice(xid, location);
+					System.out.println("Price of rooms at this location: " + price);
+					m_resourceManager.commit(xid);
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;
 			}
 			case ReserveFlight: {
@@ -348,15 +593,27 @@ public abstract class Client
 				System.out.println("-Customer ID: " + arguments.elementAt(2));
 				System.out.println("-Flight Number: " + arguments.elementAt(3));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 				int flightNum = toInt(arguments.elementAt(3));
 
-				if (m_resourceManager.reserveFlight(id, customerID, flightNum)) {
-					System.out.println("Flight Reserved");
-				} else {
-					System.out.println("Flight could not be reserved");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.reserveFlight(xid, customerID, flightNum)) {
+						m_resourceManager.commit(xid);
+						System.out.println("Flight Reserved");
+					} else {
+						m_resourceManager.abort(xid);
+						System.out.println("Flight could not be reserved");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
+				
 				break;
 			}
 			case ReserveCar: {
@@ -366,15 +623,26 @@ public abstract class Client
 				System.out.println("-Customer ID: " + arguments.elementAt(2));
 				System.out.println("-Car Location: " + arguments.elementAt(3));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 				String location = arguments.elementAt(3);
 
-				if (m_resourceManager.reserveCar(id, customerID, location)) {
-					System.out.println("Car Reserved");
-				} else {
-					System.out.println("Car could not be reserved");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.reserveCar(xid, customerID, location)) {
+						m_resourceManager.commit(xid);
+						System.out.println("Car Reserved");
+					} else {
+						m_resourceManager.abort(xid);
+						System.out.println("Car could not be reserved");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case ReserveRoom: {
@@ -384,15 +652,26 @@ public abstract class Client
 				System.out.println("-Customer ID: " + arguments.elementAt(2));
 				System.out.println("-Room Location: " + arguments.elementAt(3));
 				
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 				String location = arguments.elementAt(3);
 
-				if (m_resourceManager.reserveRoom(id, customerID, location)) {
-					System.out.println("Room Reserved");
-				} else {
-					System.out.println("Room could not be reserved");
-				}
+				//open transaction
+				int xid = m_resourceManager.start();
+
+				//perform operation
+				try {
+					if (m_resourceManager.reserveRoom(xid, customerID, location)) {
+						m_resourceManager.commit(xid);
+						System.out.println("Room Reserved");
+					} else {
+						m_resourceManager.abort(xid);
+						System.out.println("Room could not be reserved");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
+				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+
 				break;
 			}
 			case Bundle: {

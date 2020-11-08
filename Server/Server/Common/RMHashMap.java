@@ -36,7 +36,14 @@ public class RMHashMap extends HashMap<String, RMItem>
 		RMHashMap obj = new RMHashMap();
 		for (String key : keySet())
 		{
-			obj.put(key, (RMItem)get(key).clone());
+			RMItem item = get(key);
+			//if the previous value is null we want to indicate this
+			if(item==null) {
+				obj.put(key, null);
+			} else {
+				obj.put(key, (RMItem)get(key).clone());
+			}
+			
 		}
 		return obj;
 	}

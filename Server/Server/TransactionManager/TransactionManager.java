@@ -10,29 +10,106 @@ public class TransactionManager {
     //data it writes over before it writes over it so that when aborted or fails to commit we revert.
     protected HashMap<Integer, RMHashMap> previousData;
 
-    protected HashMap<Integer, Boolean> activeTransactions;
+    protected HashMap<Integer, TransactionStatus> activeTransactions;
+
+    protected HashMap<Integer, TransactionStatus> inactiveTransactions;
+
+    public Integer next_xid = 0;
+
+    public enum TransactionStatus {
+		COMMITTED,
+        ABORTED,
+        INVALID,
+        ACTIVE
+	};
     
 
     public TransactionManager() {
         previousData = new HashMap<Integer, RMHashMap>();
-        activeTransactions = new HashMap<Integer, Boolean>();
+        activeTransactions = new HashMap<Integer, TransactionStatus>();
+        inactiveTransactions = new HashMap<Integer, TransactionStatus>();
+    }
+
+    public int startTransaction() {
+        int xid = getNextTransactionId();
+        //add the transaction to list of active transactions
+        addActiveTransaction(xid);
+
+        //print info
+        Trace.info("TM::startTransaction() created new transaction " + xid);
+
+        return xid;
+    }
+
+    public int getNextTransactionId()
+	{
+		synchronized(next_xid) {
+            Integer next = next_xid;
+            next_xid = next_xid + 1;
+            return next;
+		}
     }
 
     public Boolean isActiveTransaction(int xid)
 	{
 		synchronized(activeTransactions) {
-			Boolean isActive = activeTransactions.get(xid);
+			TransactionStatus isActive = activeTransactions.get(xid);
 			if (isActive != null)
-				return false;
+				return true;
 			else
-                return true;
+                return false;
 		}
+    }
+
+    public TransactionStatus isValidTransaction(int xid) {
+        synchronized(activeTransactions) {
+            Boolean isActive = isActiveTransaction(xid);
+            if(isActive) return TransactionStatus.ACTIVE;
+            else {
+                synchronized(inactiveTransactions) {
+                    TransactionStatus isInactive = inactiveTransactions.get(xid);
+                    if(isInactive == TransactionStatus.INVALID) return TransactionStatus.INVALID;
+                    else return isInactive;
+                }
+            }
+        }
+    }
+
+    public void commitTransaction(int xid) {
+		//call on commit method to
+        // 1- delete previous data stored in case of abort
+        removePreviousValues(xid);
+        // 2- remove it from active transactions
+        removeActiveTransaction(xid);
+        // 3- put the xid in the inactive but committed
+        addInactiveTransaction(xid, TransactionStatus.COMMITTED);
+
+        //print info
+        Trace.info("TM::commitTransaction(" + xid + ") committed");
+    }
+
+    public void abortTransaction(int xid) {
+        // 1- delete previous data stored in case of abort
+        removePreviousValues(xid);
+        // 2- remove it from active transactions
+        removeActiveTransaction(xid);
+        // 3- put the xid in the inactive but aborted
+        addInactiveTransaction(xid, TransactionStatus.ABORTED);
+
+        //print info
+        Trace.info("TM::abortTransaction(" + xid + ") aborted");
+    }
+
+    public void addInactiveTransaction(int xid, TransactionStatus status) {
+        synchronized(inactiveTransactions) {
+            inactiveTransactions.put(xid, status);
+        }
     }
     
     public void addActiveTransaction(int xid) 
     {
         synchronized(activeTransactions) {
-            activeTransactions.put(xid, true);
+            activeTransactions.put(xid, TransactionStatus.ACTIVE);
         }
     }
 
@@ -49,7 +126,7 @@ public class TransactionManager {
 	public RMHashMap readPreviousValues(int xid)
 	{
 		synchronized(previousData) {
-			RMHashMap x_previousData = (RMHashMap)previousData.get(xid);
+			RMHashMap x_previousData = previousData.get(xid);
 			if (x_previousData != null) {
 				return (RMHashMap)x_previousData.clone();
 			}

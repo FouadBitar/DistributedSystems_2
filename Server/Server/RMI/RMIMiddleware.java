@@ -2,6 +2,7 @@ package Server.RMI;
 
 import Server.Interface.*;
 import Server.Common.*;
+import Server.TransactionManager.*;
 
 import java.rmi.NotBoundException;
 import java.util.*;
@@ -151,104 +152,104 @@ public class RMIMiddleware implements IResourceManager {
 	// --------------
 	// --------------
 
-	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException {
-
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+	public boolean addFlight(int id, int flightNum, int flightSeats, int flightPrice) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
+		return false;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		boolean result = flight_rm.addFlight(id, flightNum, flightSeats, flightPrice);
 
-		return result;
+		return result; */
 	}
 
 	public boolean addCars(int id, String location, int numCars, int price) throws RemoteException {
+		return false;
+		// IResourceManager car_rm = resource_managers_hash.get("Cars");
+		// boolean result = car_rm.addCars(id, location, numCars, price);
 
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
-		boolean result = car_rm.addCars(id, location, numCars, price);
-
-		return result;
+		// return result;
 	}
 
     public boolean addRooms(int id, String location, int numRooms, int price) throws RemoteException {
-
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
+		return false;
+		/* IResourceManager room_rm = resource_managers_hash.get("Rooms");
 		boolean result = room_rm.addRooms(id, location, numRooms, price);
 
-		return result;
+		return result; */
 	} 			    
 
     public boolean deleteFlight(int id, int flightNum) throws RemoteException {
-
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return false;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		boolean result = flight_rm.deleteFlight(id, flightNum);
 
-		return result;
+		return result; */
 	}
 
 	public boolean deleteCars(int id, String location) throws RemoteException {
-		
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
+		return false;
+		/* IResourceManager car_rm = resource_managers_hash.get("Cars");
 		boolean result = car_rm.deleteCars(id, location);
 
-		return result;
+		return result; */
 	}
 
 
     public boolean deleteRooms(int id, String location) throws RemoteException {
-		
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
+		return false;
+		/* IResourceManager room_rm = resource_managers_hash.get("Rooms");
 		boolean result = room_rm.deleteRooms(id, location);
 
-		return result;
+		return result; */
 	}
 
 	public int queryFlight(int id, int flightNumber) throws RemoteException {
-		
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return 0;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		int result = flight_rm.queryFlight(id, flightNumber);
 
-		return result;
+		return result; */
 	}
 
 
     public int queryCars(int id, String location) throws RemoteException {
-		
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
+		return 0;
+		/* IResourceManager car_rm = resource_managers_hash.get("Cars");
 		int result = car_rm.queryCars(id, location);
 
-		return result;
+		return result; */
 	}
 
     public int queryRooms(int id, String location) throws RemoteException {
-		
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
+		return 0;
+		/* IResourceManager room_rm = resource_managers_hash.get("Rooms");
 		int result = room_rm.queryRooms(id, location);
 
-		return result;
+		return result; */
 	}
 
 	public int queryFlightPrice(int id, int flightNumber) throws RemoteException {
-
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return 0;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		int result = flight_rm.queryFlightPrice(id, flightNumber);
 
-		return result;
+		return result; */
 	}
 
 
     public int queryCarsPrice(int id, String location) throws RemoteException {
-		
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
+		return 0;
+		/* IResourceManager car_rm = resource_managers_hash.get("Cars");
 		int result = car_rm.queryCarsPrice(id, location);
 
-		return result;
+		return result; */
 	}
 
 
     public int queryRoomsPrice(int id, String location) throws RemoteException {
-		
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
+		return 0;
+		/* IResourceManager room_rm = resource_managers_hash.get("Rooms");
 		int result = room_rm.queryRoomsPrice(id, location);
 
-		return result;
+		return result; */
 	}
 
 	 
@@ -258,7 +259,8 @@ public class RMIMiddleware implements IResourceManager {
 	// --------------
 
     public int newCustomer(int id) throws RemoteException {
-
+		return 0;
+/* 
 		IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		IResourceManager car_rm = resource_managers_hash.get("Cars");
 		IResourceManager room_rm = resource_managers_hash.get("Rooms");
@@ -270,13 +272,13 @@ public class RMIMiddleware implements IResourceManager {
 		car_rm.newCustomer(id, cid);
 		room_rm.newCustomer(id, cid);
 
-		return cid;
+		return cid; */
 	}
 	
 	
     public boolean newCustomer(int id, int cid) throws RemoteException {
-
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return false;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		IResourceManager car_rm = resource_managers_hash.get("Cars");
 		IResourceManager room_rm = resource_managers_hash.get("Rooms");
 
@@ -287,13 +289,13 @@ public class RMIMiddleware implements IResourceManager {
 		car_rm.newCustomer(id, cid);
 		room_rm.newCustomer(id, cid);
 
-		return result;
+		return result; */
 	}
     
     
     public boolean deleteCustomer(int id, int customerID) throws RemoteException {
-		
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return false;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		IResourceManager car_rm = resource_managers_hash.get("Cars");
 		IResourceManager room_rm = resource_managers_hash.get("Rooms");
 
@@ -302,13 +304,13 @@ public class RMIMiddleware implements IResourceManager {
 		car_rm.deleteCustomer(id, customerID);
 		room_rm.deleteCustomer(id, customerID);
 
-		return result;
+		return result; */
 	}
 
 
     public String queryCustomerInfo(int id, int customerID) throws RemoteException {
-		
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return "";
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		IResourceManager car_rm = resource_managers_hash.get("Cars");
 		IResourceManager room_rm = resource_managers_hash.get("Rooms");
 
@@ -320,40 +322,40 @@ public class RMIMiddleware implements IResourceManager {
 		// structure the results
 		String final_bill = "Flight Bill: \n" + flight_bill + "Car Bill: \n" + car_bill + "Room Bill: \n" + room_bill;
 
-		return final_bill;
+		return final_bill; */
 	}
 
 
     public boolean reserveFlight(int id, int customerID, int flightNumber) throws RemoteException {
-
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return false;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		boolean result = flight_rm.reserveFlight(id, customerID, flightNumber);
 
-		return result;
+		return result; */
 	}
 
 
     public boolean reserveCar(int id, int customerID, String location) throws RemoteException {
-		
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
+		return false;
+		/* IResourceManager car_rm = resource_managers_hash.get("Cars");
 		boolean result = car_rm.reserveCar(id, customerID, location);
 
-		return result;
+		return result; */
 	}
 
 	
     public boolean reserveRoom(int id, int customerID, String location) throws RemoteException {
-		
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
+		return false;
+		/* IResourceManager room_rm = resource_managers_hash.get("Rooms");
 		boolean result = room_rm.reserveRoom(id, customerID, location);
 
-		return result;
+		return result; */
 	}
 
  
     public boolean bundle(int id, int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException {
-		
-		IResourceManager flight_rm = resource_managers_hash.get("Flights");
+		return false;
+		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
 		IResourceManager car_rm = resource_managers_hash.get("Cars");
 		IResourceManager room_rm = resource_managers_hash.get("Rooms");
 
@@ -373,7 +375,7 @@ public class RMIMiddleware implements IResourceManager {
 		}
 
 		
-		return result;
+		return result; */
 		
 	}
 
@@ -384,6 +386,26 @@ public class RMIMiddleware implements IResourceManager {
 	public static int toInt(String string) throws NumberFormatException
 	{
 		return (Integer.valueOf(string)).intValue();
+	}
+
+	public int start() 
+    throws RemoteException {
+		return 0;
+	}
+
+    public boolean commit(int transactionId) 
+    throws RemoteException, TransactionAbortedException, InvalidTransactionException {
+		return false;
+	}
+    
+    public void abort(int transactionId) 
+    throws RemoteException, InvalidTransactionException {
+		return;
+	}
+    
+    public boolean shutdown() 
+    throws RemoteException {
+		return false;
 	}
 	
     

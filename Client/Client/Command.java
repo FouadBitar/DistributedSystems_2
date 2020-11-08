@@ -1,5 +1,6 @@
 package Client;
 
+
 public enum Command {
 	Help("List all available commands", "[CommandName]"),
 

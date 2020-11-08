@@ -7,8 +7,6 @@ import java.rmi.registry.Registry;
 import java.rmi.RemoteException;
 import java.rmi.NotBoundException;
 
-import java.util.*;
-import java.io.*;
 
 public class RMIClient extends Client
 {
@@ -16,7 +14,7 @@ public class RMIClient extends Client
 	private static int s_serverPort = 1095;
 	private static String s_serverName = "Server";
 	private static String s_rmiPrefix = "group_49_";
-
+	
 	public static void main(String args[])
 	{	
 		if (args.length > 0)
