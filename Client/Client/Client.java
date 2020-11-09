@@ -140,8 +140,8 @@ public abstract class Client
 						middleware.commit(xid3);
 
 					} 
-					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+					catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+					catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 
 				} else if(id ==2) {
@@ -161,8 +161,8 @@ public abstract class Client
 						middleware.commit(xid2);
 
 					} 
-					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+					catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+					catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 				} else if(id ==3) {
 					//this tests to see if the timeouts occur for these 
 					int xid4 = middleware.start();
@@ -197,6 +197,10 @@ public abstract class Client
 					
 				} else if (id == 7) {
 					middleware.shutdown();
+				} else if (id == 8) {
+					int xid20 = middleware.start();
+					middleware.reserveFlight(xid20, 10, 45);
+					middleware.abort(xid20, false);
 				}
 				else {
 					//perform operation
@@ -206,8 +210,8 @@ public abstract class Client
 						middleware.addFlight(xid, flightNum, flightSeats, flightPrice);
 						middleware.abort(xid, false);
 					} 
-					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+					catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+					catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 					
 					break;
 				}
@@ -243,8 +247,8 @@ public abstract class Client
 						System.out.println("Cars could not be added");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -277,8 +281,8 @@ public abstract class Client
 						System.out.println("Rooms could not be added");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -298,8 +302,8 @@ public abstract class Client
 
 					System.out.println("Add customer ID: " + customer);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 				
 				break;
 			}
@@ -328,8 +332,8 @@ public abstract class Client
 						System.out.println("Customer could not be added");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -358,8 +362,8 @@ public abstract class Client
 						System.out.println("Flight could not be deleted");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -388,8 +392,8 @@ public abstract class Client
 						System.out.println("Cars could not be deleted");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -418,8 +422,8 @@ public abstract class Client
 						System.out.println("Rooms could not be deleted");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -448,8 +452,8 @@ public abstract class Client
 						System.out.println("Customer could not be deleted");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -471,8 +475,8 @@ public abstract class Client
 					System.out.println("Number of seats available: " + seats);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -494,8 +498,8 @@ public abstract class Client
 					System.out.println("Number of cars at this location: " + numCars);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;
@@ -518,8 +522,8 @@ public abstract class Client
 					System.out.println("Number of rooms at this location: " + numRoom);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;
@@ -542,8 +546,8 @@ public abstract class Client
 					System.out.print(bill);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;               
@@ -566,8 +570,8 @@ public abstract class Client
 					System.out.println("Price of a seat: " + price);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;
@@ -590,8 +594,8 @@ public abstract class Client
 					System.out.println("Price of cars at this location: " + price);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;
@@ -614,8 +618,8 @@ public abstract class Client
 					System.out.println("Price of rooms at this location: " + price);
 					middleware.commit(xid);
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;
@@ -644,8 +648,8 @@ public abstract class Client
 						System.out.println("Flight could not be reserved");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				
 				break;
@@ -674,8 +678,8 @@ public abstract class Client
 						System.out.println("Car could not be reserved");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -703,8 +707,8 @@ public abstract class Client
 						System.out.println("Room could not be reserved");
 					}
 				} 
-				catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-				catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
 
 				break;
 			}
@@ -724,7 +728,7 @@ public abstract class Client
 				System.out.println("-Book Car: " + arguments.elementAt(arguments.size()-2));
 				System.out.println("-Book Room: " + arguments.elementAt(arguments.size()-1));
 
-				int id = toInt(arguments.elementAt(1));
+				// int id = toInt(arguments.elementAt(1));
 				int customerID = toInt(arguments.elementAt(2));
 				Vector<String> flightNumbers = new Vector<String>();
 				for (int i = 0; i < arguments.size() - 6; ++i)
@@ -735,11 +739,21 @@ public abstract class Client
 				boolean car = toBoolean(arguments.elementAt(arguments.size()-2));
 				boolean room = toBoolean(arguments.elementAt(arguments.size()-1));
 
-				if (middleware.bundle(id, customerID, flightNumbers, location, car, room)) {
-					System.out.println("Bundle Reserved");
-				} else {
-					System.out.println("Bundle could not be reserved");
-				}
+				int xid = middleware.start();
+
+				//perform operation
+				try {
+					if (middleware.bundle(xid, customerID, flightNumbers, location, car, room)) {
+						middleware.commit(xid);
+						System.out.println("Bundle Reserved");
+					} else {
+						middleware.abort(xid, false);
+						System.out.println("Bundle could not be reserved");
+					}
+				} 
+				catch (InvalidTransactionException ei) { System.out.println(ei.getMessage()); } 
+				catch (TransactionAbortedException ea) { System.out.println(ea.getMessage()); }
+
 				break;
 			}
 			case Quit:

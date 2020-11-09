@@ -63,6 +63,7 @@ public class ResourceManager implements IResourceManager
 		Trace.info("RM::deleteItem(" + xid + ", " + key + ") called");
 
 		ReservableItem curObj = (ReservableItem)readData(xid, key);
+		RMItem clone = (ReservableItem)readData(xid, key);
 		
 		// Check if there is such an item in the storage
 		if (curObj == null) 
@@ -75,7 +76,7 @@ public class ResourceManager implements IResourceManager
 			if (curObj.getReserved() == 0)
 			{
 				//save data before writing
-				writePreviousValue(xid, curObj.getKey(), curObj);
+				writePreviousValue(xid, curObj.getKey(), clone);
 				removeData(xid, curObj.getKey());
 				Trace.info("RM::deleteItem(" + xid + ", " + key + ") item deleted");
 				return true;
@@ -125,6 +126,7 @@ public class ResourceManager implements IResourceManager
 
 		// Read customer object if it exists (and read lock it)
 		Customer customer = (Customer)readData(xid, Customer.getKey(customerID));
+		RMItem cloneCustomer= (Customer)readData(xid, Customer.getKey(customerID));
 		if (customer == null)
 		{
 			Trace.warn("RM::reserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ")  failed--customer doesn't exist");
@@ -133,6 +135,7 @@ public class ResourceManager implements IResourceManager
 
 		// Check if the item is available
 		ReservableItem item = (ReservableItem)readData(xid, key);
+		RMItem cloneItem = (ReservableItem)readData(xid, key);
 		if (item == null)
 		{
 			Trace.warn("RM::reserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ") failed--item doesn't exist");
@@ -146,8 +149,8 @@ public class ResourceManager implements IResourceManager
 		else
 		{     
 			//save data before writing
-			writePreviousValue(xid, customer.getKey(), customer);
-			writePreviousValue(xid, item.getKey(), item);
+			writePreviousValue(xid, customer.getKey(), cloneCustomer);
+			writePreviousValue(xid, item.getKey(), cloneItem);
 
 			//update customer info
 			customer.reserve(key, location, item.getPrice());        
@@ -201,7 +204,8 @@ public class ResourceManager implements IResourceManager
 	{
 		//store data this method is going to write to in case of abort
 		Car curObj = (Car)readData(xid, Car.getKey(location));
-		writePreviousValue(xid, Car.getKey(location), curObj);
+		RMItem clone = (Car)readData(xid, Car.getKey(location));
+		writePreviousValue(xid, Car.getKey(location), clone);
 
 		if (curObj == null)
 		{
@@ -230,7 +234,8 @@ public class ResourceManager implements IResourceManager
 	{
 		//store data this method is going to write to in case of abort
 		Room curObj = (Room)readData(xid, Room.getKey(location));
-		writePreviousValue(xid, Room.getKey(location), curObj);
+		RMItem roomClone = (Room)readData(xid, Room.getKey(location));
+		writePreviousValue(xid, Room.getKey(location), roomClone);
 
 
 		if (curObj == null)
@@ -384,6 +389,7 @@ public class ResourceManager implements IResourceManager
 
 		//read customer data
 		Customer customer = (Customer)readData(xid, Customer.getKey(customerID));
+		RMItem cloneCustomer = (Customer)readData(xid, Customer.getKey(customerID));
 
 
 		//customer doesnt exist
@@ -396,7 +402,7 @@ public class ResourceManager implements IResourceManager
 			// write new customer
 
 			//store customer that is about to removed
-			writePreviousValue(xid, Customer.getKey(customerID), customer);
+			writePreviousValue(xid, Customer.getKey(customerID), cloneCustomer);
 
 			// Increase the reserved numbers of all reservable items which the customer reserved. 
 			RMHashMap reservations = customer.getReservations();
@@ -405,9 +411,10 @@ public class ResourceManager implements IResourceManager
 				ReservedItem reserveditem = customer.getReservedItem(reservedKey);
 				Trace.info("RM::deleteCustomer(" + xid + ", " + customerID + ") has reserved " + reserveditem.getKey() + " " +  reserveditem.getCount() +  " times");
 				ReservableItem item  = (ReservableItem)readData(xid, reserveditem.getKey());
+				RMItem cloneItem = (ReservableItem)readData(xid, reserveditem.getKey());
 
 				//save value of reserved item before reserved count is changed
-				writePreviousValue(xid, item.getKey(), item);
+				writePreviousValue(xid, item.getKey(), cloneItem);
 
 				Trace.info("RM::deleteCustomer(" + xid + ", " + customerID + ") has reserved " + reserveditem.getKey() + " which is reserved " +  item.getReserved() +  " times and is still available " + item.getCount() + " times");
 				item.setReserved(item.getReserved() - reserveditem.getCount());

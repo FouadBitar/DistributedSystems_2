@@ -245,7 +245,7 @@ public class RMIMiddleware implements IMiddleware {
 	}
 
 	public boolean addFlight(int xid, int flightNum, int flightSeats, int flightPrice) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
-		Trace.info("RM::addFlight(" + xid + ", " + flightNum + ", " + flightSeats + ", $" + flightPrice + ") called");
+		Trace.info("MW::addFlight(" + xid + ", " + flightNum + ", " + flightSeats + ", $" + flightPrice + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -269,14 +269,14 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		
 		catch(DeadlockException de) {
-			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
+			Trace.info("MW::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
 	public boolean addCars(int xid, String location, int numCars, int price) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
-		Trace.info("RM::addCars(" + xid + ", " + location + ", " + numCars + ", $" + price + ") called");
+		Trace.info("MW::addCars(" + xid + ", " + location + ", " + numCars + ", $" + price + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -300,14 +300,14 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		
 		catch(DeadlockException de) {
-			Trace.info("RM::addCars(" + xid + ") could not add cars, deadlock exception");
+			Trace.info("MW::addCars(" + xid + ") could not add cars, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
     public boolean addRooms(int xid, String location, int numRooms, int price) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
-		Trace.info("RM::addRooms(" + xid + ", " + location + ", " + numRooms + ", $" + price + ") called");
+		Trace.info("MW::addRooms(" + xid + ", " + location + ", " + numRooms + ", $" + price + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -331,14 +331,14 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		
 		catch(DeadlockException de) {
-			Trace.info("RM::addRooms(" + xid + ") could not add rooms, deadlock exception");
+			Trace.info("MW::addRooms(" + xid + ") could not add rooms, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	} 			    
 
     public boolean deleteFlight(int xid, int flightNum) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
-		Trace.info("RM::deleteFlight(" + xid + ", flightNum=" + flightNum + ") called");
+		Trace.info("MW::deleteFlight(" + xid + ", flightNum=" + flightNum + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -362,14 +362,14 @@ public class RMIMiddleware implements IMiddleware {
 
 		}
 		catch(DeadlockException de) {
-			Trace.info("RM::deleteFlight(" + xid + ") could not be done, deadlock exception");
+			Trace.info("MW::deleteFlight(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
 	public boolean deleteCars(int xid, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
-		Trace.info("RM::deleteCars(" + xid + ", location=" + location + ") called");
+		Trace.info("MW::deleteCars(" + xid + ", location=" + location + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -393,7 +393,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		}
 		catch(DeadlockException de) {
-			Trace.info("RM::deleteCars(" + xid + ") could not be done, deadlock exception");
+			Trace.info("MW::deleteCars(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -401,7 +401,7 @@ public class RMIMiddleware implements IMiddleware {
 
 
     public boolean deleteRooms(int xid, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
-		Trace.info("RM::deleteRooms(" + xid + ", location=" + location + ") called");
+		Trace.info("MW::deleteRooms(" + xid + ", location=" + location + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -425,14 +425,14 @@ public class RMIMiddleware implements IMiddleware {
 
 		}
 		catch(DeadlockException de) {
-			Trace.info("RM::deleteRooms(" + xid + ") could not be done, deadlock exception");
+			Trace.info("MW::deleteRooms(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
 	public int queryFlight(int xid, int flightNumber) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::queryFlight(" + xid + ", flightNum=" + flightNumber + ") called");
+		Trace.info("MW::queryFlight(" + xid + ", flightNum=" + flightNumber + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -451,7 +451,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		}
 		catch(DeadlockException de) {
-			Trace.info("RM::queryFlight(" + xid + ") could not be done, deadlock exception");
+			Trace.info("MW::queryFlight(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -459,7 +459,7 @@ public class RMIMiddleware implements IMiddleware {
 
 
     public int queryCars(int xid, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::queryFlight(" + xid + ", location=" + location + ") called");
+		Trace.info("MW::queryFlight(" + xid + ", location=" + location + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -478,14 +478,14 @@ public class RMIMiddleware implements IMiddleware {
 
 		}
 		catch(DeadlockException de) {
-			Trace.info("RM::queryCars(" + xid + ") could not be done, deadlock exception");
+			Trace.info("MW::queryCars(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
     public int queryRooms(int xid, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::queryFlight(" + xid + ", location=" + location + ") called");
+		Trace.info("MW::queryFlight(" + xid + ", location=" + location + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -504,7 +504,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		}
 		catch(DeadlockException de) {
-			Trace.info("RM::queryCars(" + xid + ") could not be done, deadlock exception");
+			Trace.info("MW::queryCars(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -512,7 +512,7 @@ public class RMIMiddleware implements IMiddleware {
 
 	public int queryFlightPrice(int xid, int flightNumber) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
 		
-		Trace.info("RM::queryFlightPrice(" + xid + ", flightNum=" + flightNumber + ") called");
+		Trace.info("MW::queryFlightPrice(" + xid + ", flightNum=" + flightNumber + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -532,7 +532,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort the transaction
 		catch(DeadlockException de) {
-			Trace.info("RM::queryFlightPrice(" + xid + ") could not query the price, deadlock exception");
+			Trace.info("MW::queryFlightPrice(" + xid + ") could not query the price, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -540,7 +540,7 @@ public class RMIMiddleware implements IMiddleware {
 
 
     public int queryCarsPrice(int xid, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::queryCarsPrice(" + xid + ", location=" + location + ") called");
+		Trace.info("MW::queryCarsPrice(" + xid + ", location=" + location + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -560,7 +560,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort the transaction
 		catch(DeadlockException de) {
-			Trace.info("RM::queryCarsPrice(" + xid + ") could not query the price, deadlock exception");
+			Trace.info("MW::queryCarsPrice(" + xid + ") could not query the price, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -568,7 +568,7 @@ public class RMIMiddleware implements IMiddleware {
 
 
     public int queryRoomsPrice(int xid, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::queryRoomsPrice(" + xid + ", location=" + location + ") called");
+		Trace.info("MW::queryRoomsPrice(" + xid + ", location=" + location + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -588,7 +588,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort the transaction
 		catch(DeadlockException de) {
-			Trace.info("RM::queryRoomsPrice(" + xid + ") could not query the price, deadlock exception");
+			Trace.info("MW::queryRoomsPrice(" + xid + ") could not query the price, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -603,7 +603,7 @@ public class RMIMiddleware implements IMiddleware {
 	//need to store the resource managers involved in the transaction so that if aborted we can send a message to each to abort and revert
     public int newCustomer(int xid) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
 
-		Trace.info("RM::newCustomer(" + xid + ") called");
+		Trace.info("MW::newCustomer(" + xid + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -636,7 +636,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort transaction
 		catch(DeadlockException de) {
-			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
+			Trace.info("MW::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -644,7 +644,7 @@ public class RMIMiddleware implements IMiddleware {
 	
 	
     public boolean newCustomer(int xid, int cid) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::newCustomer(" + xid + ", " + cid + ") called");
+		Trace.info("MW::newCustomer(" + xid + ", " + cid + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -676,7 +676,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort the transaction and throw exception
 		catch(DeadlockException de) {
-			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
+			Trace.info("MW::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -684,7 +684,7 @@ public class RMIMiddleware implements IMiddleware {
     
     
     public boolean deleteCustomer(int xid, int customerID) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::deleteCustomer(" + xid + ", " + customerID + ") called");
+		Trace.info("MW::deleteCustomer(" + xid + ", " + customerID + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -716,7 +716,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort the transaction and throw exception
 		catch(DeadlockException de) {
-			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
+			Trace.info("MW::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -724,7 +724,7 @@ public class RMIMiddleware implements IMiddleware {
 
 
     public String queryCustomerInfo(int xid, int customerID) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::queryCustomerInfo(" + xid + ", " + customerID + ") called");
+		Trace.info("MW::queryCustomerInfo(" + xid + ", " + customerID + ") called");
 
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -760,33 +760,16 @@ public class RMIMiddleware implements IMiddleware {
 		}
 		//deadlock occured, abort the transaction
 		catch(DeadlockException de) {
-			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
+			Trace.info("MW::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
-
-
-
-		//return "";
-		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
-
-		// since the information of the flights, cars and rooms is on separate servers, we can display the info from each one
-		String flight_bill = flight_rm.queryCustomerInfo(id, customerID);
-		String car_bill = car_rm.queryCustomerInfo(id, customerID);
-		String room_bill = room_rm.queryCustomerInfo(id, customerID);
-
-		// structure the results
-		String final_bill = "Flight Bill: \n" + flight_bill + "Car Bill: \n" + car_bill + "Room Bill: \n" + room_bill;
-
-		return final_bill; */
 	}
 
 
     public boolean reserveFlight(int xid, int customerID, int flightNumber) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
 
-		Trace.info("RM::reserveFlight(" + xid + ", customer=" + customerID + ", flight-" + flightNumber + ", " + ") called" );
+		Trace.info("MW::reserveFlight(" + xid + ", customer=" + customerID + ", flight-" + flightNumber + ", " + ") called" );
 		
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -809,7 +792,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 
 		catch(DeadlockException de) {
-			Trace.info("RM::reserveFlight(" + xid + ") could not reserve flight, deadlock exception");
+			Trace.info("MW::reserveFlight(" + xid + ") could not reserve flight, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -817,7 +800,7 @@ public class RMIMiddleware implements IMiddleware {
 
 
     public boolean reserveCar(int xid, int customerID, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::reserveCar(" + xid + ", customer=" + customerID + ", location-" + location + ", " + ") called" );
+		Trace.info("MW::reserveCar(" + xid + ", customer=" + customerID + ", location-" + location + ", " + ") called" );
 		
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -840,7 +823,7 @@ public class RMIMiddleware implements IMiddleware {
 		}
 
 		catch(DeadlockException de) {
-			Trace.info("RM::reserveCar(" + xid + ") could not reserve car, deadlock exception");
+			Trace.info("MW::reserveCar(" + xid + ") could not reserve car, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
@@ -848,7 +831,7 @@ public class RMIMiddleware implements IMiddleware {
 
 	
     public boolean reserveRoom(int xid, int customerID, String location) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		Trace.info("RM::reserveRoom(" + xid + ", customer=" + customerID + ", location-" + location + ", " + ") called" );
+		Trace.info("MW::reserveRoom(" + xid + ", customer=" + customerID + ", location-" + location + ", " + ") called" );
 		
 		//check that the transaction is active
 		isTransactionActive(xid);
@@ -871,37 +854,84 @@ public class RMIMiddleware implements IMiddleware {
 		}
 
 		catch(DeadlockException de) {
-			Trace.info("RM::reserveRoom(" + xid + ") could not reserve room, deadlock exception");
+			Trace.info("MW::reserveRoom(" + xid + ") could not reserve room, deadlock exception");
 			abort(xid, false);
 			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
  
-    public boolean bundle(int id, int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
-		return false;
-		/* IResourceManager flight_rm = resource_managers_hash.get("Flights");
-		IResourceManager car_rm = resource_managers_hash.get("Cars");
-		IResourceManager room_rm = resource_managers_hash.get("Rooms");
+    public boolean bundle(int xid, int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException, TransactionAbortedException, InvalidTransactionException  {
+		Trace.info("MW::bundle(" + xid + ", customer=" + customerID + ", numbFlights=" + flightNumbers.size() + ", location-" + location + ", car=" + car + ", room=" + room + ") called" );
 
-		boolean result = true;
+		//check that the transaction is active
+		isTransactionActive(xid);
 
-		// reserve set of flights
-		for(String flightNumber : flightNumbers) {
-			flight_rm.reserveFlight(id, customerID, toInt(flightNumber));
-		}
-		
-		// reserve car and/or room at final location
-		if(car) {
-			car_rm.reserveCar(id, customerID, location);
-		}
-		if(room) {
-			room_rm.reserveRoom(id, customerID, location);
+
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		if(room) list.add(ResourceManagerInvolved.ROOMS);
+		if(car) list.add(ResourceManagerInvolved.CARS);
+		list.add(ResourceManagerInvolved.FLIGHTS);
+		tm.addTransactionRM(xid, list);
+
+		try{
+			//grab  read lock
+			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			if(room) lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			if(car) lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+
+			
+			IResourceManager rm_r = null, rm_c = null;
+			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
+			if(room) {  rm_r = resource_managers.get(ROOM_SERVER_NAME); }
+			if(car) {  rm_c = resource_managers.get(CAR_SERVER_NAME); }
+
+			//reserve the flights
+			boolean didReserveFlights = false;
+			for(String flightNumber : flightNumbers) {
+				didReserveFlights = rm_f.reserveFlight(xid, customerID, toInt(flightNumber));
+			}
+			if(!didReserveFlights && rm_f != null) {
+				//abort the transaction could not reserve every flight
+				Trace.info("MW::bundle(" + xid + ", customer=" + customerID + ", numbFlights=" + flightNumbers.size() + ", location-" + location + ", car=" + car + ", room=" + room + ") could not reserve every flight" );
+				abort(xid, false);
+				throw new TransactionAbortedException(xid, "Could not reserve every flight");
+			}
+
+			//reserve the room
+			if(room && rm_r != null) {
+				boolean didReserveRoom = false;
+				didReserveRoom = rm_r.reserveRoom(xid, customerID, location);
+				if(!didReserveRoom){
+					//abort the transaction could not reserve every flight
+					Trace.info("MW::bundle(" + xid + ", customer=" + customerID + ", numbFlights=" + flightNumbers.size() + ", location-" + location + ", car=" + car + ", room=" + room + ") could not reserve the room" );
+					abort(xid, false);
+					throw new TransactionAbortedException(xid, "Could not reserve the room");
+				}
+			}
+
+			//reserve the room
+			if(car && rm_c != null) {
+				boolean didReserveCar = false;
+				didReserveCar = rm_c.reserveCar(xid, customerID, location);
+				if(!didReserveCar){
+					//abort the transaction could not reserve every flight
+					Trace.info("MW::bundle(" + xid + ", customer=" + customerID + ", numbFlights=" + flightNumbers.size() + ", location-" + location + ", car=" + car + ", room=" + room + ") could not reserve the car" );
+					abort(xid, false);
+					throw new TransactionAbortedException(xid, "Could not reserve the car");
+				}
+			}
+
+
+			return true;
 		}
 
-		
-		return result; */
-		
+		catch(DeadlockException de) {
+			Trace.info("MW::bundle(" + xid + ", customer=" + customerID + ", numbFlights=" + flightNumbers.size() + ", location-" + location + ", car=" + car + ", room=" + room + ") could not reserve bundle, deadlock exception" );
+			abort(xid, false);
+			throw new TransactionAbortedException(xid, "Deadlock occured");
+		}
 	}
 
     public String getName() throws RemoteException {
