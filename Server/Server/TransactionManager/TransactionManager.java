@@ -2,17 +2,24 @@ package Server.TransactionManager;
 
 
 import Server.Common.*;
+import Server.Interface.*;
+import Server.RMI.RMIMiddleware;
+
+import java.rmi.RemoteException;
 import java.util.*;
 
 public class TransactionManager {
 
-    //we want that for each active transaction, it somehow stores the values of the 
-    //data it writes over before it writes over it so that when aborted or fails to commit we revert.
-    protected HashMap<Integer, RMHashMap> previousData;
 
     protected HashMap<Integer, TransactionStatus> activeTransactions;
+    
+    protected HashMap<Integer, List<ResourceManagerInvolved>> activeTransactionsRMs;
 
     protected HashMap<Integer, TransactionStatus> inactiveTransactions;
+
+    protected static RMIMiddleware middleware;
+
+    protected static HashMap<String, IResourceManager> resource_managers;
 
     public Integer next_xid = 0;
 
@@ -21,24 +28,65 @@ public class TransactionManager {
         ABORTED,
         INVALID,
         ACTIVE
+    };
+    
+    public enum ResourceManagerInvolved {
+		FLIGHTS,
+        CARS,
+        ROOMS
 	};
     
 
-    public TransactionManager() {
-        previousData = new HashMap<Integer, RMHashMap>();
+    public TransactionManager(RMIMiddleware rmi_middleware) {
         activeTransactions = new HashMap<Integer, TransactionStatus>();
         inactiveTransactions = new HashMap<Integer, TransactionStatus>();
+        activeTransactionsRMs = new HashMap<Integer, List<ResourceManagerInvolved>>();
+        middleware = rmi_middleware; 
     }
 
-    public int startTransaction() {
+    public void storeResourceManagers(HashMap<String, IResourceManager> rms) {
+        resource_managers = rms;
+    }
+
+    public int startTransaction() throws RemoteException {
+        //get the next unique id
         int xid = getNextTransactionId();
+
         //add the transaction to list of active transactions
         addActiveTransaction(xid);
+
+        //start the timeout mechanism 
+		middleware.startTimeout(xid);
+
 
         //print info
         Trace.info("TM::startTransaction() created new transaction " + xid);
 
         return xid;
+    }
+
+    //this method is called by the time to live mechanism, the transaction manager will 
+    //message the middleware to abort the transaction
+    // public void timeoutAbort(int xid) throws RemoteException, InvalidTransactionException {
+    //     synchronized(middleware) {
+    //         middleware.abort(xid);
+    //     }
+    // }
+
+    public void addTransactionRM(int xid, List<ResourceManagerInvolved> rms) {
+        List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+        for(ResourceManagerInvolved rm : rms) {
+            list.add(rm);
+        }
+        synchronized(activeTransactionsRMs) { 
+            activeTransactionsRMs.put(xid, list);
+        }
+    }
+
+    public void removeTransactionRM(int xid) {
+        synchronized(activeTransactionsRMs) {
+            activeTransactionsRMs.remove(xid);
+        }
     }
 
     public int getNextTransactionId()
@@ -75,25 +123,74 @@ public class TransactionManager {
         }
     }
 
-    public void commitTransaction(int xid) {
-		//call on commit method to
-        // 1- delete previous data stored in case of abort
-        removePreviousValues(xid);
-        // 2- remove it from active transactions
+    public void commitTransaction(int xid) throws RemoteException {
+        
+        // 1- stop the timeout mechanism
+        middleware.stopTimeout(xid);
+
+        // 2- delete previous data stored in case of abort from all involved resource managers, then delete the list of resource managers involved
+        synchronized(activeTransactionsRMs) {
+            List<ResourceManagerInvolved> x_rms = activeTransactionsRMs.get(xid);
+            //check if the associated resource managers are there and more than 0 
+            if(x_rms != null && !x_rms.isEmpty()) {
+                List<IResourceManager> rms = new LinkedList<IResourceManager>();
+                for(ResourceManagerInvolved rminvolved : x_rms) {
+                    if(rminvolved == ResourceManagerInvolved.FLIGHTS) rms.add(resource_managers.get(RMIMiddleware.FLIGHT_SERVER_NAME));
+                    if(rminvolved == ResourceManagerInvolved.CARS) rms.add(resource_managers.get(RMIMiddleware.CAR_SERVER_NAME));
+                    if(rminvolved == ResourceManagerInvolved.ROOMS) rms.add(resource_managers.get(RMIMiddleware.ROOM_SERVER_NAME));
+                }
+                for(IResourceManager rm : rms) {
+                    rm.removePreviousValues(xid);
+                }
+                activeTransactionsRMs.remove(xid);
+            }
+        }
+        
+        // 3- remove it from active transactions
         removeActiveTransaction(xid);
-        // 3- put the xid in the inactive but committed
+
+        // 4- put the xid in the inactive but committed
         addInactiveTransaction(xid, TransactionStatus.COMMITTED);
 
         //print info
         Trace.info("TM::commitTransaction(" + xid + ") committed");
     }
 
-    public void abortTransaction(int xid) {
-        // 1- delete previous data stored in case of abort
-        removePreviousValues(xid);
-        // 2- remove it from active transactions
+    public void abortTransaction(int xid, boolean timedOut) throws RemoteException {
+
+        System.out.println("enters transaction manager abortTransaction - " + xid);
+
+        // 1- stop the timeout mechanism
+        //if it was a timeout message sent by the timeoutmanager, then do nothing
+        if(!timedOut) {
+            middleware.stopTimeout(xid);
+        }
+        
+
+        // 2- revert previous data stored from all involved resource managers, then delete the list of resource managers involved
+        synchronized(activeTransactionsRMs) {
+            List<ResourceManagerInvolved> x_rms = activeTransactionsRMs.get(xid);
+            if(x_rms != null && !x_rms.isEmpty()) { 
+                List<IResourceManager> rms = new LinkedList<IResourceManager>();
+                for(ResourceManagerInvolved rminvolved : x_rms) {
+                    if(rminvolved == ResourceManagerInvolved.FLIGHTS) rms.add(resource_managers.get(RMIMiddleware.FLIGHT_SERVER_NAME));
+                    if(rminvolved == ResourceManagerInvolved.CARS) rms.add(resource_managers.get(RMIMiddleware.CAR_SERVER_NAME));
+                    if(rminvolved == ResourceManagerInvolved.ROOMS) rms.add(resource_managers.get(RMIMiddleware.ROOM_SERVER_NAME));
+                }
+                //revert the values for each resource manager then remove them
+                for(IResourceManager rm : rms) {
+                    rm.revertPreviousValues(xid);
+                    rm.removePreviousValues(xid);
+                }
+                //remove the resource managers involved list
+                activeTransactionsRMs.remove(xid);
+            }
+        }
+
+        // 3- remove it from active transactions
         removeActiveTransaction(xid);
-        // 3- put the xid in the inactive but aborted
+
+        // 4- put the xid in the inactive but aborted
         addInactiveTransaction(xid, TransactionStatus.ABORTED);
 
         //print info
@@ -119,46 +216,5 @@ public class TransactionManager {
             activeTransactions.remove(xid);
         }
     }
-
-    // Read the hashmap of the previous values the transaction saw 
-    // before changing them (i.e. what they were at the start of writing).
-    // This method takes in the transaction id and gives the hashmap of strings and values.
-	public RMHashMap readPreviousValues(int xid)
-	{
-		synchronized(previousData) {
-			RMHashMap x_previousData = previousData.get(xid);
-			if (x_previousData != null) {
-				return (RMHashMap)x_previousData.clone();
-			}
-			return null;
-		}
-	}
-
-    // Transaction wants to write a value to a data item, it uses this method
-    // first to store the previous value
-	public void writePreviousValue(int xid, String key, RMItem value)
-	{
-		synchronized(previousData) {
-            //get the RMHashMap for the specific transaction and add the value
-            RMHashMap x_map = previousData.get(xid);
-            if(x_map == null) {
-                x_map = new RMHashMap();
-                x_map.put(key, value);
-                previousData.put(xid, x_map);
-            } else {
-                x_map.put(key, value);
-                previousData.put(xid, x_map);
-            }
-		}
-	}
-
-    // Transaction is no longer active, remove the previous values stored 
-    // as it has either been committed or is being aborted so we do not need to save the values anymore
-	public void removePreviousValues(int xid)
-	{
-		synchronized(previousData) {
-			previousData.remove(xid);
-		}
-	}
      
 }

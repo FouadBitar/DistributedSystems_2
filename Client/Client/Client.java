@@ -99,7 +99,8 @@ public abstract class Client
 				int flightPrice = toInt(arguments.elementAt(4));
 
 				//open transaction
-				int xid = m_resourceManager.start();
+				int xid = 0;
+				// int xid = m_resourceManager.start();
 				
 
 				if(id == 0) {
@@ -148,7 +149,7 @@ public abstract class Client
 					//test to see if multiple transactions can read at the same time
 					int xid1 = m_resourceManager.start();
 					int xid2 = m_resourceManager.start();
-					int xid3 = m_resourceManager.start();
+					// int xid3 = m_resourceManager.start();
 
 					//perform operation
 					try {
@@ -163,7 +164,13 @@ public abstract class Client
 					} 
 					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
 					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
-				} 
+				} else if(id ==3) {
+					int xid4 = m_resourceManager.start();
+					int xid5 = m_resourceManager.start();
+					int xid6 = m_resourceManager.start();
+				} else if (id == 4) {
+					m_resourceManager.start();
+				}
 				else {
 					//perform operation
 					try {

@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import Server.TransactionManager.*;
+import Server.Common.*;
 
 import java.util.*;
 
@@ -25,6 +26,14 @@ import java.util.*;
 
 public interface IResourceManager extends Remote 
 {
+
+    public void removePreviousValues(int xid) throws RemoteException;
+
+    // public RMHashMap readPreviousValues(int xid) throws RemoteException;
+
+    public void revertPreviousValues(int xid) throws RemoteException;
+
+
     /**
      * Add seats to a flight.
      *
@@ -201,7 +210,7 @@ public interface IResourceManager extends Remote
      * @return Success
      */
     public boolean bundle(int id, int customerID, Vector<String> flightNumbers, String location, boolean car, boolean room)
-	throws RemoteException; 
+	throws RemoteException, TransactionAbortedException, InvalidTransactionException; 
 
     /**
      * Convenience for probing the resource manager.
@@ -219,7 +228,7 @@ public interface IResourceManager extends Remote
     public boolean commit(int transactionId) 
     throws RemoteException, TransactionAbortedException, InvalidTransactionException;
     
-    public void abort(int transactionId) 
+    public void abort(int transactionId, boolean timedOut) 
     throws RemoteException, InvalidTransactionException;
     
     public boolean shutdown() 
