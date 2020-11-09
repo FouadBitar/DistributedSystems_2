@@ -99,12 +99,12 @@ public abstract class Client
 				int flightPrice = toInt(arguments.elementAt(4));
 
 				//open transaction
-				int xid = 0;
-				// int xid = m_resourceManager.start();
+				// int xid = 0;
 				
+				int xid = -1;
 
 				if(id == 0) {
-					
+					xid = m_resourceManager.start();
 					//perform operation
 					try {
 						if (m_resourceManager.addFlight(xid, flightNum, flightSeats, flightPrice)) {
@@ -114,12 +114,12 @@ public abstract class Client
 						} 
 						else {
 							//could not add, abort the transaction
-							m_resourceManager.abort(xid);
+							m_resourceManager.abort(xid, false);
 							System.out.println("Flight could not be added, transaction was aborted");
 						}
 					} 
-					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
-					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
+					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid -  " + ei.getMessage()); } 
+					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted - " + ea.getMessage()); }
 					
 					break;
 				} else if(id == 1) {
@@ -145,8 +145,7 @@ public abstract class Client
 
 
 				} else if(id ==2) {
-					//test to see if multiple writes can take place - they should not be able to
-					//test to see if multiple transactions can read at the same time
+					//test to see if timeout unlocks the resource 
 					int xid1 = m_resourceManager.start();
 					int xid2 = m_resourceManager.start();
 					// int xid3 = m_resourceManager.start();
@@ -165,11 +164,27 @@ public abstract class Client
 					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
 					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
 				} else if(id ==3) {
+					//this tests to see if the timeouts occur for these 
 					int xid4 = m_resourceManager.start();
 					int xid5 = m_resourceManager.start();
 					int xid6 = m_resourceManager.start();
 				} else if (id == 4) {
 					m_resourceManager.start();
+				} else if (id == 5) {
+
+					int xid33 = m_resourceManager.start();
+
+					try{
+						Thread.sleep(4000);
+					} 
+					catch(InterruptedException e) {
+						System.out.println(e);
+					} 
+
+					m_resourceManager.commit(xid33);
+				} else if (id == 6) {
+					//check to see when timeouts occur the resources are let go
+					
 				}
 				else {
 					//perform operation
@@ -177,7 +192,7 @@ public abstract class Client
 
 						
 						m_resourceManager.addFlight(xid, flightNum, flightSeats, flightPrice);
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 					} 
 					catch (InvalidTransactionException ei) { System.out.println("This transaction id is invalid: " + xid); } 
 					catch (TransactionAbortedException ea) { System.out.println("This transaction has been aborted: " + xid); }
@@ -212,7 +227,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Cars could not be added");
 					}
 				} 
@@ -246,7 +261,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Rooms could not be added");
 					}
 				} 
@@ -297,7 +312,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Customer could not be added");
 					}
 				} 
@@ -327,7 +342,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Flight could not be deleted");
 					}
 				} 
@@ -357,7 +372,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Cars could not be deleted");
 					}
 				} 
@@ -387,7 +402,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Rooms could not be deleted");
 					}
 				} 
@@ -417,7 +432,7 @@ public abstract class Client
 					} 
 					else {
 						//could not add, abort the transaction
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Customer could not be deleted");
 					}
 				} 
@@ -613,7 +628,7 @@ public abstract class Client
 						m_resourceManager.commit(xid);
 						System.out.println("Flight Reserved");
 					} else {
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Flight could not be reserved");
 					}
 				} 
@@ -643,7 +658,7 @@ public abstract class Client
 						m_resourceManager.commit(xid);
 						System.out.println("Car Reserved");
 					} else {
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Car could not be reserved");
 					}
 				} 
@@ -672,7 +687,7 @@ public abstract class Client
 						m_resourceManager.commit(xid);
 						System.out.println("Room Reserved");
 					} else {
-						m_resourceManager.abort(xid);
+						m_resourceManager.abort(xid, false);
 						System.out.println("Room could not be reserved");
 					}
 				} 

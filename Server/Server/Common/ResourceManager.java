@@ -6,14 +6,12 @@
 package Server.Common;
 
 import Server.Interface.*;
-import Server.LockManager.*;
 import Server.TransactionManager.*;
 
 import java.util.*;
 import java.rmi.RemoteException;
 
 
-//what happens when the client disconnects, the locks for that client's transactions need to be removed.
 
 public class ResourceManager implements IResourceManager
 {
@@ -21,66 +19,7 @@ public class ResourceManager implements IResourceManager
 	protected RMHashMap m_data = new RMHashMap();
 	protected HashMap<Integer, RMHashMap> previousData;
 
-	// Read the hashmap of the previous values the transaction saw 
-    // before changing them (i.e. what they were at the start of writing).
-    // This method takes in the transaction id and gives the hashmap of strings and values.
-	public RMHashMap readPreviousValues(int xid) throws RemoteException
-	{
-		synchronized(previousData) {
-			RMHashMap x_previousData = previousData.get(xid);
-			if (x_previousData != null) {
-				return (RMHashMap)x_previousData.clone();
-			}
-			return null;
-		}
-	}
 
-    // Transaction wants to write a value to a data item, it uses this method
-    // first to store the previous value
-	public void writePreviousValue(int xid, String key, RMItem value) throws RemoteException
-	{
-		synchronized(previousData) {
-            //get the RMHashMap for the specific transaction and add the value
-            RMHashMap x_map = previousData.get(xid);
-            if(x_map == null) {
-                x_map = new RMHashMap();
-                x_map.put(key, value);
-                previousData.put(xid, x_map);
-            } else {
-                x_map.put(key, value);
-                previousData.put(xid, x_map);
-            }
-		}
-	}
-
-    // Transaction is no longer active, remove the previous values stored 
-    // as it has either been committed or is being aborted so we do not need to save the values anymore
-	public void removePreviousValues(int xid) throws RemoteException
-	{
-		synchronized(previousData) {
-			previousData.remove(xid);
-		}
-	}
-
-	public void revertPreviousValues(int xid) throws RemoteException {
-		RMHashMap prev_data = readPreviousValues(xid);
-
-		//if there are values that were written, revert them
-		if(prev_data != null && prev_data.size() > 0) {
-			for (Map.Entry<String, RMItem> entry : prev_data.entrySet()) {
-				String key = entry.getKey();
-				RMItem value = entry.getValue();
-				
-				//we already have the write locks for these keys because we wrote to them
-				if(value == null) { //it did not exist before, simply remove it
-					removeData(xid, key);
-				} else { //it did exist, revert its value
-					writeData(xid, key, value);
-				}
-			}
-		} 
-	}
-	
 	
 	public ResourceManager(String p_name)
 	{
@@ -514,105 +453,88 @@ public class ResourceManager implements IResourceManager
 	}
 
 
-	//client wants to start new transaction
-	//send unique transaction id
+
+
 	public int start() throws RemoteException {
 		return 0;
-
-		/* int xid = tm.startTransaction();
-
-		//start the timeout mechanism
-		TimeToLiveMechanism timeout = new TimeToLiveMechanism(xid, this);
-		timeout.start();
-		//save the timeout object to update the time and stop it when the transaction is committed or aborted
-		activeTransactionsTimeouts.put(xid, timeout);
-
-		return xid; */
 	}
 
-	//need to make the activeTransactionsTimeout object synchronized
     public boolean commit(int transactionId) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
 		return false;
-		/* //first check it is a valid active transaction
-		TransactionManager.TransactionStatus status = tm.isValidTransaction(transactionId);
-		if(status == TransactionManager.TransactionStatus.INVALID) {
-			throw new InvalidTransactionException(transactionId, "Transaction is invalid");
-		} else {
-			if(status == TransactionManager.TransactionStatus.ACTIVE) {
-
-				tm.commitTransaction(transactionId);
-
-				//unlock all the locks 
-				lm.UnlockAll(transactionId);
-
-				//stop the timeout
-				TimeToLiveMechanism timeout = activeTransactionsTimeouts.get(transactionId);
-				timeout.stopTimeout();
-				activeTransactionsTimeouts.remove(transactionId);
-
-				return true;
-			} else if (status == TransactionManager.TransactionStatus.ABORTED) {
-				throw new TransactionAbortedException(transactionId, "Transaction has been aborted");
-			} else {
-				//its already been committed
-				return true;
-			}
-		} */
 	}
     
     public void abort(int transactionId, boolean timedOut) throws RemoteException, InvalidTransactionException {
 		return;
-		/* //check the status of the transaction
-		TransactionManager.TransactionStatus status = tm.isValidTransaction(transactionId);
-		//boolean isValid = tm.isActiveTransaction(transactionId);
-		if(status == TransactionManager.TransactionStatus.INVALID) {
-			throw new InvalidTransactionException(transactionId, "Invalid Transaction");
-		} else {
-			if(status == TransactionManager.TransactionStatus.COMMITTED) {
-				//transaction already committed
-				throw new InvalidTransactionException(transactionId, "Transaction already committed");
-			} else if (status == TransactionManager.TransactionStatus.ABORTED) {
-				//transaction already aborted, do nothing
-			} else {
-				//transaction is active, abort it
-
-
-				//revert any writes the transaction did
-				RMHashMap prev_data = tm.readPreviousValues(transactionId);
-
-				//if there are values that were written, revert them
-				if(prev_data != null && prev_data.size() > 0) {
-					for (Map.Entry<String, RMItem> entry : prev_data.entrySet()) {
-						String key = entry.getKey();
-						RMItem value = entry.getValue();
-						
-						//we already have the write locks for these keys because we wrote to them
-						if(value == null) { //it did not exist before, simply remove it
-							removeData(transactionId, key);
-						} else { //it did exist, revert its value
-							writeData(transactionId, key, value);
-						}
-					}
-				} 
-
-				tm.abortTransaction(transactionId);
-
-				//then unlock the locks held
-				lm.UnlockAll(transactionId);
-
-				//remove it from the timeout
-				TimeToLiveMechanism timeout = activeTransactionsTimeouts.get(transactionId);
-				if(timeout != null) { 
-					timeout.stopTimeout();
-					activeTransactionsTimeouts.remove(transactionId);
-				}
-
-			}
-		} */
 	}
     
     public boolean shutdown() throws RemoteException {
 		return false;
+	}
+
+
+	//helper method, reads the values before they were written for this transaction
+	private RMHashMap readPreviousValues(int xid) throws RemoteException
+	{
+		synchronized(previousData) {
+			RMHashMap x_previousData = previousData.get(xid);
+			if (x_previousData != null) {
+				return (RMHashMap)x_previousData.clone();
+			}
+			return null;
+		}
+	}
+
+	//store copy of what this key was, used to revert in case of abort
+	public void writePreviousValue(int xid, String key, RMItem value) throws RemoteException
+	{
+		synchronized(previousData) {
+			//get the RMHashMap for the specific transaction and add the value
+			RMHashMap x_map = previousData.get(xid);
+			if(x_map == null) {
+				x_map = new RMHashMap();
+				x_map.put(key, value);
+				previousData.put(xid, x_map);
+			} else {
+				x_map.put(key, value);
+				previousData.put(xid, x_map);
+			}
+		}
+	}
+
+	//transaction is no longer active, can remove the storage of the state before writing
+	public void removePreviousValues(int xid) throws RemoteException
+	{
+		synchronized(previousData) {
+			previousData.remove(xid);
+		}
+	}
+
+
+	//transaction is being aborted, revert the values to what they were before the writes of the transaction
+	public void revertPreviousValues(int xid) throws RemoteException {
+		RMHashMap prev_data = readPreviousValues(xid);
+
+		Trace.info("RM::revertPreviousValues(" + xid + ") called");
+
+		//if there are values that were written, revert them
+		if(prev_data != null && prev_data.size() > 0) {
+			for (Map.Entry<String, RMItem> entry : prev_data.entrySet()) {
+				String key = entry.getKey();
+				RMItem value = entry.getValue();
+				
+				//we already have the write locks for these keys because we wrote to them
+				if(value == null) { //it did not exist before, simply remove it
+					removeData(xid, key);
+				} else { //it did exist, revert its value
+					writeData(xid, key, value);
+				}
+			}
+		} 
+	}
+
+	//log that the transaction is being committed
+	public void transactionCommitted(int xid) throws RemoteException {
+		Trace.info("RM::commitTransaction(" + xid + ") committed");
 	}
 }
  

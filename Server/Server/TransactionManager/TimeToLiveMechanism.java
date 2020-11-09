@@ -1,11 +1,8 @@
 package Server.TransactionManager;
 
-import Server.Common.*;
-import Server.Interface.IResourceManager;
-import Server.RMI.RMIMiddleware;
+
 import Server.TransactionManager.Message.MessageType;
 
-import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.concurrent.*;
 
@@ -19,9 +16,7 @@ public class TimeToLiveMechanism extends Thread {
     BlockingQueue<Message> out_queue = new LinkedBlockingQueue<Message>();
 
     public TimeToLiveMechanism(int xid) {
-        if(xid > 0) {
-            transactionId = xid;
-        }
+        transactionId = xid;
     }
 
     //if the transaction is committed or aborted, then this thread is terminated

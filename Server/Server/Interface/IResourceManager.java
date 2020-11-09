@@ -29,9 +29,9 @@ public interface IResourceManager extends Remote
 
     public void removePreviousValues(int xid) throws RemoteException;
 
-    // public RMHashMap readPreviousValues(int xid) throws RemoteException;
-
     public void revertPreviousValues(int xid) throws RemoteException;
+
+    public void transactionCommitted(int xid) throws RemoteException;
 
 
     /**

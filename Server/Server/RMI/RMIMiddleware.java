@@ -136,7 +136,7 @@ public class RMIMiddleware implements IResourceManager {
 			TimeoutManager timeoutmanagerServer = new TimeoutManager();
 
 			// Get the reference to the middleware server
-			timeoutmanagerServer.connectToMiddleware("localhost", s_serverPort, s_serverName);
+			timeoutmanagerServer.connectToMiddleware("localhost", s_serverPort, s_serverName, s_rmiPrefix);
 			
 			// Dynamically generate the stub (client proxy)
             timeoutmanager_rmi = (ITimeoutManager)UnicastRemoteObject.exportObject(timeoutmanagerServer, 0);
@@ -235,8 +235,10 @@ public class RMIMiddleware implements IResourceManager {
 	public boolean isTransactionActive(int xid) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
 		TransactionManager.TransactionStatus status = tm.isValidTransaction(xid);
 		if(status == TransactionManager.TransactionStatus.ACTIVE) return true;
-		else if(status == TransactionManager.TransactionStatus.COMMITTED || status == TransactionManager.TransactionStatus.INVALID) 
-			throw new InvalidTransactionException(xid, "This transaction is either invalid or already committed");
+		else if(status == TransactionManager.TransactionStatus.COMMITTED)
+			throw new InvalidTransactionException(xid, "This transaction has already been committed");
+		else if(status == TransactionManager.TransactionStatus.INVALID) 
+			throw new InvalidTransactionException(xid, "This transaction is invalid");
 		else 
 			throw new TransactionAbortedException(xid, "This transaction has been aborted");
 	}
@@ -246,6 +248,11 @@ public class RMIMiddleware implements IResourceManager {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		list.add(ResourceManagerInvolved.FLIGHTS);
+		tm.addTransactionRM(xid, list);
 
 		try{
 			// grab write lock for the flight data
@@ -273,6 +280,11 @@ public class RMIMiddleware implements IResourceManager {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		list.add(ResourceManagerInvolved.CARS);
+		tm.addTransactionRM(xid, list);
+
 		try{
 			// grab write lock 
 			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
@@ -298,6 +310,11 @@ public class RMIMiddleware implements IResourceManager {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		list.add(ResourceManagerInvolved.ROOMS);
+		tm.addTransactionRM(xid, list);
 
 		try{
 			// grab write lock 
@@ -325,6 +342,11 @@ public class RMIMiddleware implements IResourceManager {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		list.add(ResourceManagerInvolved.FLIGHTS);
+		tm.addTransactionRM(xid, list);
+
 		try{
 			//grab  read lock
 			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
@@ -350,6 +372,11 @@ public class RMIMiddleware implements IResourceManager {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		list.add(ResourceManagerInvolved.CARS);
+		tm.addTransactionRM(xid, list);
 
 		try{
 			// grab write lock 
@@ -377,6 +404,11 @@ public class RMIMiddleware implements IResourceManager {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//add the resource managers this operation will interact with
+		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
+		list.add(ResourceManagerInvolved.ROOMS);
+		tm.addTransactionRM(xid, list);
 
 		try{
 			// grab write lock 
@@ -574,6 +606,7 @@ public class RMIMiddleware implements IResourceManager {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
 
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
@@ -924,8 +957,6 @@ public class RMIMiddleware implements IResourceManager {
 				//transaction already aborted, do nothing
 			} else {
 				//transaction is active, abort it
-				System.out.println("enters middleware abort - " + transactionId);
-
 				tm.abortTransaction(transactionId, timedOut);
 
 				//then unlock the locks held
@@ -948,9 +979,14 @@ public class RMIMiddleware implements IResourceManager {
 		return false;
 	}
 
+
+	public void transactionCommitted(int xid) {
+		return;
+	}
+
 	public void removePreviousValues(int xid) { return; }
 
-    public RMHashMap readPreviousValues(int xid) { return new RMHashMap(); }
+    // public RMHashMap readPreviousValues(int xid) { return new RMHashMap(); }
 
     public void revertPreviousValues(int xid) { return; }
 	

@@ -48,30 +48,7 @@ public class TransactionManager {
         resource_managers = rms;
     }
 
-    public int startTransaction() throws RemoteException {
-        //get the next unique id
-        int xid = getNextTransactionId();
 
-        //add the transaction to list of active transactions
-        addActiveTransaction(xid);
-
-        //start the timeout mechanism 
-		middleware.startTimeout(xid);
-
-
-        //print info
-        Trace.info("TM::startTransaction() created new transaction " + xid);
-
-        return xid;
-    }
-
-    //this method is called by the time to live mechanism, the transaction manager will 
-    //message the middleware to abort the transaction
-    // public void timeoutAbort(int xid) throws RemoteException, InvalidTransactionException {
-    //     synchronized(middleware) {
-    //         middleware.abort(xid);
-    //     }
-    // }
 
     public void addTransactionRM(int xid, List<ResourceManagerInvolved> rms) {
         List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
@@ -123,6 +100,43 @@ public class TransactionManager {
         }
     }
 
+
+    public void addInactiveTransaction(int xid, TransactionStatus status) {
+        synchronized(inactiveTransactions) {
+            inactiveTransactions.put(xid, status);
+        }
+    }
+    
+    public void addActiveTransaction(int xid) 
+    {
+        synchronized(activeTransactions) {
+            activeTransactions.put(xid, TransactionStatus.ACTIVE);
+        }
+    }
+
+    public void removeActiveTransaction(int xid) 
+    {
+        synchronized(activeTransactions) {
+            activeTransactions.remove(xid);
+        }
+    }
+
+    public int startTransaction() throws RemoteException {
+        //get the next unique id
+        int xid = getNextTransactionId();
+
+        //add the transaction to list of active transactions
+        addActiveTransaction(xid);
+
+        //print info
+        Trace.info("TM::startTransaction() created new transaction " + xid);
+
+        //start the timeout mechanism 
+		middleware.startTimeout(xid);
+
+        return xid;
+    }
+
     public void commitTransaction(int xid) throws RemoteException {
         
         // 1- stop the timeout mechanism
@@ -141,6 +155,7 @@ public class TransactionManager {
                 }
                 for(IResourceManager rm : rms) {
                     rm.removePreviousValues(xid);
+                    rm.transactionCommitted(xid);
                 }
                 activeTransactionsRMs.remove(xid);
             }
@@ -158,8 +173,6 @@ public class TransactionManager {
 
     public void abortTransaction(int xid, boolean timedOut) throws RemoteException {
 
-        System.out.println("enters transaction manager abortTransaction - " + xid);
-
         // 1- stop the timeout mechanism
         //if it was a timeout message sent by the timeoutmanager, then do nothing
         if(!timedOut) {
@@ -170,6 +183,7 @@ public class TransactionManager {
         // 2- revert previous data stored from all involved resource managers, then delete the list of resource managers involved
         synchronized(activeTransactionsRMs) {
             List<ResourceManagerInvolved> x_rms = activeTransactionsRMs.get(xid);
+            if(x_rms == null) System.out.println("the activetransactionsrms is null");
             if(x_rms != null && !x_rms.isEmpty()) { 
                 List<IResourceManager> rms = new LinkedList<IResourceManager>();
                 for(ResourceManagerInvolved rminvolved : x_rms) {
@@ -194,27 +208,13 @@ public class TransactionManager {
         addInactiveTransaction(xid, TransactionStatus.ABORTED);
 
         //print info
-        Trace.info("TM::abortTransaction(" + xid + ") aborted");
+        if(timedOut) {
+            Trace.info("TM::abortTransaction(" + xid + ") timeout occured, aborted");
+        } else {
+            Trace.info("TM::abortTransaction(" + xid + ") aborted");
+        }
+        
     }
 
-    public void addInactiveTransaction(int xid, TransactionStatus status) {
-        synchronized(inactiveTransactions) {
-            inactiveTransactions.put(xid, status);
-        }
-    }
-    
-    public void addActiveTransaction(int xid) 
-    {
-        synchronized(activeTransactions) {
-            activeTransactions.put(xid, TransactionStatus.ACTIVE);
-        }
-    }
-
-    public void removeActiveTransaction(int xid) 
-    {
-        synchronized(activeTransactions) {
-            activeTransactions.remove(xid);
-        }
-    }
      
 }
