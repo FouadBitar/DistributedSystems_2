@@ -11,7 +11,7 @@ FORCE: ;
 ../Server/RMIInterface.jar: ../Server/Server/Interface/IResourceManager.java
 	make -C ../Server/ RMIInterface.jar
 
-../Server/MyExceptions.jar: ../Server/Server/TransactionManager/TransactionAbortedException.java ../Server/Server/TransactionManager/InvalidTransactionException.java
+../Server/MyExceptions.jar: ../Server/Server/Exception/TransactionAbortedException.java ../Server/Server/Exception/InvalidTransactionException.java
 	make -C ../Server/ MyExceptions.jar
 
 compile-client: ../Server/RMIInterface.jar ../Server/MyExceptions.jar Client/*.java 

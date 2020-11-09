@@ -1,8 +1,9 @@
 package Server.TransactionManager;
 
 import Server.Common.Trace;
-import Server.Interface.IResourceManager;
+import Server.Interface.*;
 import Server.TransactionManager.Message.MessageType;
+import Server.Exception.*;
 
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
@@ -16,7 +17,7 @@ import java.util.Iterator;
 public class TimeoutManager implements ITimeoutManager {
     
 
-    private static IResourceManager middleware;
+    private static IMiddleware middleware;
     private static  ConcurrentHashMap<Integer, TimeToLiveMechanism> transactionTimeouts;
 
 
@@ -32,7 +33,7 @@ public class TimeoutManager implements ITimeoutManager {
 			while (true) {
 				try {
 					Registry registry = LocateRegistry.getRegistry(server, port);
-                    IResourceManager rm_temp = (IResourceManager)registry.lookup(s_rmiPrefix + name);
+                    IMiddleware rm_temp = (IMiddleware)registry.lookup(s_rmiPrefix + name);
                     middleware = rm_temp;
 					System.out.println("Connected to '" + name + "' server [" + server + ":" + port + "/" + s_rmiPrefix + name + "]");
 					break;

@@ -5,10 +5,12 @@
 
 package Server.Common;
 
-import java.util.*;
+
 
 public class Customer extends RMItem
 {
+
+	private static final long serialVersionUID = 1L;
 	private int m_ID;
 	private RMHashMap m_reservations;
 

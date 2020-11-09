@@ -1,6 +1,8 @@
-package Server.TransactionManager;
+package Server.Exception;
 
 public class InvalidTransactionException extends Exception {
+
+	private static final long serialVersionUID = 1L;
     
     private int m_xid = 0;
 

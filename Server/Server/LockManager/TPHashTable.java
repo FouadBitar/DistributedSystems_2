@@ -1,12 +1,12 @@
 package Server.LockManager;
 
 import java.util.Vector;
-import java.util.Enumeration;
 
 /* HashTable class for the Lock Manager */
 
 public class TPHashTable
 {
+
 	private static final int HASH_DEPTH = 8;
 
 	private Vector<Vector<TransactionObject>> m_vector;
@@ -121,7 +121,7 @@ public class TPHashTable
 		return null;
 	}
 
-	private void printStatus(String msg, int hashSlot, TransactionObject xobj)
+	public void printStatus(String msg, int hashSlot, TransactionObject xobj)
 	{
 		System.out.println(this.getClass() + "::" + msg + "(slot" + hashSlot + ")::" + xobj.toString());
 	}

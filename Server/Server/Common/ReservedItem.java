@@ -10,6 +10,8 @@ package Server.Common;
 // instance of ReservedItem reflecting the *latest price*
 public class ReservedItem extends RMItem
 {
+	private static final long serialVersionUID = 1L;
+	
 	private int m_nCount;
 	private int m_nPrice;
 	private String m_strReservableItemKey;

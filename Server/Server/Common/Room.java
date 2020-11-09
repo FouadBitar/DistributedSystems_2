@@ -7,6 +7,7 @@ package Server.Common;
 
 public class Room extends ReservableItem
 {
+	private static final long serialVersionUID = 1L;
 	public Room(String location, int count, int price)
 	{
 		super(location, count, price);

@@ -3,6 +3,7 @@ package Server.RMI;
 import Server.Interface.*;
 import Server.Common.*;
 import Server.TransactionManager.*;
+import Server.Exception.*;
 import Server.TransactionManager.TransactionManager.ResourceManagerInvolved;
 import Server.LockManager.*;
 
@@ -23,7 +24,7 @@ import java.rmi.server.UnicastRemoteObject;
  * 		track fo the resources that the customer interacts with. When we require information on all three, we 
  * 		would manipulate it either her in the middleware or another resource manager if complexity increases.
  */
-public class RMIMiddleware implements IResourceManager {
+public class RMIMiddleware implements IMiddleware {
 
     private static final int s_serverPort = 1095;
     private static String s_serverName = "Server";
@@ -102,7 +103,7 @@ public class RMIMiddleware implements IResourceManager {
 			
 
 			// Dynamically generate the stub (client proxy)
-			IResourceManager resourceManager = (IResourceManager)UnicastRemoteObject.exportObject(server, 0);
+			IMiddleware resourceManager = (IMiddleware)UnicastRemoteObject.exportObject(server, 0);
 
 			// Bind the remote object's stub in the registry
 			Registry l_registry;
@@ -240,7 +241,7 @@ public class RMIMiddleware implements IResourceManager {
 		else if(status == TransactionManager.TransactionStatus.INVALID) 
 			throw new InvalidTransactionException(xid, "This transaction is invalid");
 		else 
-			throw new TransactionAbortedException(xid, "This transaction has been aborted");
+			throw new TransactionAbortedException(xid, "This transaction has already been aborted");
 	}
 
 	public boolean addFlight(int xid, int flightNum, int flightSeats, int flightPrice) throws RemoteException, TransactionAbortedException, InvalidTransactionException {
@@ -270,7 +271,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -301,7 +302,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addCars(" + xid + ") could not add cars, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -332,7 +333,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addRooms(" + xid + ") could not add rooms, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	} 			    
 
@@ -363,7 +364,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::deleteFlight(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -394,7 +395,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::deleteCars(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -426,7 +427,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::deleteRooms(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -452,7 +453,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::queryFlight(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -479,7 +480,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::queryCars(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -505,7 +506,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::queryCars(" + xid + ") could not be done, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -533,7 +534,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::queryFlightPrice(" + xid + ") could not query the price, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -561,7 +562,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::queryCarsPrice(" + xid + ") could not query the price, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -589,7 +590,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::queryRoomsPrice(" + xid + ") could not query the price, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -637,7 +638,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 	
@@ -677,7 +678,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
     
@@ -717,7 +718,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -761,7 +762,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::addFlight(" + xid + ") could not add flight, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 
 
@@ -810,7 +811,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::reserveFlight(" + xid + ") could not reserve flight, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -841,7 +842,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::reserveCar(" + xid + ") could not reserve car, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -872,7 +873,7 @@ public class RMIMiddleware implements IResourceManager {
 		catch(DeadlockException de) {
 			Trace.info("RM::reserveRoom(" + xid + ") could not reserve room, deadlock exception");
 			abort(xid, false);
-			throw new TransactionAbortedException(xid, "Deadlock occured - transaction aborted");
+			throw new TransactionAbortedException(xid, "Deadlock occured");
 		}
 	}
 
@@ -974,9 +975,31 @@ public class RMIMiddleware implements IResourceManager {
 		timeoutManager.closeTimeout(xid);
 	}
     
-    public boolean shutdown() 
-    throws RemoteException {
-		return false;
+    public void shutdown() throws RemoteException {
+		
+		// //send message to all servers telling them to shutdown
+		IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
+		IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
+		IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
+		try{
+			rm_f.shutdown();
+		} catch(Exception e) {
+			// System.out.println(e.getMessage());
+		}
+		try{
+			rm_c.shutdown();
+		} catch(Exception e) {
+			// System.out.println(e.getMessage());
+		}
+		try{
+			rm_r.shutdown();
+		} catch(Exception e) {
+			// System.out.println(e.getMessage());
+		}
+		
+
+		System.exit(0);
+
 	}
 
 

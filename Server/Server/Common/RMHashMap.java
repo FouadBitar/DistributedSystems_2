@@ -10,6 +10,8 @@ import java.util.*;
 // A specialization of HashMap with some extra diagnostics
 public class RMHashMap extends HashMap<String, RMItem>
 {
+	private static final long serialVersionUID = 1L;
+	
 	public RMHashMap() {
 		super();
 	}

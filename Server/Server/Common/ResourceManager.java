@@ -6,7 +6,7 @@
 package Server.Common;
 
 import Server.Interface.*;
-import Server.TransactionManager.*;
+import Server.Exception.*;
 
 import java.util.*;
 import java.rmi.RemoteException;
@@ -455,7 +455,7 @@ public class ResourceManager implements IResourceManager
 
 
 
-	public int start() throws RemoteException {
+/* 	public int start() throws RemoteException {
 		return 0;
 	}
 
@@ -469,6 +469,10 @@ public class ResourceManager implements IResourceManager
     
     public boolean shutdown() throws RemoteException {
 		return false;
+	} */
+
+	public void shutdown() throws RemoteException {
+		System.exit(0);
 	}
 
 

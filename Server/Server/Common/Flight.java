@@ -7,6 +7,8 @@ package Server.Common;
 
 public class Flight extends ReservableItem
 {
+	private static final long serialVersionUID = 1L;
+	
 	public Flight(int flightNum, int flightSeats, int flightPrice)
 	{
 		super(Integer.valueOf(flightNum).toString(), flightSeats, flightPrice);

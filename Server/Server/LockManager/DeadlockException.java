@@ -4,6 +4,7 @@ package Server.LockManager;
 
 public class DeadlockException extends Exception
 {
+	private static final long serialVersionUID = 1L;
 	private int m_xid = 0;
 
 	public DeadlockException(int xid, String msg)

@@ -183,7 +183,6 @@ public class TransactionManager {
         // 2- revert previous data stored from all involved resource managers, then delete the list of resource managers involved
         synchronized(activeTransactionsRMs) {
             List<ResourceManagerInvolved> x_rms = activeTransactionsRMs.get(xid);
-            if(x_rms == null) System.out.println("the activetransactionsrms is null");
             if(x_rms != null && !x_rms.isEmpty()) { 
                 List<IResourceManager> rms = new LinkedList<IResourceManager>();
                 for(ResourceManagerInvolved rminvolved : x_rms) {
