@@ -35,7 +35,7 @@ public class TimeoutManager implements ITimeoutManager {
 					Registry registry = LocateRegistry.getRegistry(server, port);
                     IMiddleware rm_temp = (IMiddleware)registry.lookup(s_rmiPrefix + name);
                     middleware = rm_temp;
-					System.out.println("Connected to '" + name + "' server [" + server + ":" + port + "/" + s_rmiPrefix + name + "]");
+					System.out.println("Timeout Manager has connected to '" + name + "' server [" + server + ":" + port + "/" + s_rmiPrefix + name + "]");
 					break;
 				}
 				catch (NotBoundException|RemoteException e) {

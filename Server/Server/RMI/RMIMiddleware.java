@@ -903,6 +903,7 @@ public class RMIMiddleware implements IMiddleware {
 			if(room && rm_r != null) {
 				boolean didReserveRoom = false;
 				didReserveRoom = rm_r.reserveRoom(xid, customerID, location);
+				System.out.println("inside bundle - " + didReserveRoom);
 				if(!didReserveRoom){
 					//abort the transaction could not reserve every flight
 					Trace.info("MW::bundle(" + xid + ", customer=" + customerID + ", numbFlights=" + flightNumbers.size() + ", location-" + location + ", car=" + car + ", room=" + room + ") could not reserve the room" );
