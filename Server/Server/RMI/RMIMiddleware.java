@@ -250,6 +250,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.FLIGHTS);
@@ -280,6 +283,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
@@ -312,6 +318,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.ROOMS);
@@ -343,6 +352,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.FLIGHTS);
@@ -373,6 +385,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
@@ -406,6 +421,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.ROOMS);
@@ -437,6 +455,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		try{
 			//grab  read lock
 			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_READ);
@@ -464,6 +485,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		try{
 			//grab  read lock
 			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_READ);
@@ -489,6 +513,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		try{
 			//grab  read lock
@@ -516,6 +543,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		try{
 			// grab read lock 
@@ -545,6 +575,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		try{
 			// grab read lock 
 			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_READ);
@@ -572,6 +605,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		try{
 			// grab read lock 
@@ -607,6 +643,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 
 		//add the resource managers this operation will interact with
@@ -649,6 +688,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.CARS);
@@ -689,6 +731,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.CARS);
@@ -728,6 +773,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
@@ -774,6 +822,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.FLIGHTS);
@@ -804,6 +855,9 @@ public class RMIMiddleware implements IMiddleware {
 		
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
@@ -836,6 +890,9 @@ public class RMIMiddleware implements IMiddleware {
 		//check that the transaction is active
 		isTransactionActive(xid);
 
+		//reset the timer as operation was performed
+		resetTimeout(xid);
+
 		//add the resource managers this operation will interact with
 		List<ResourceManagerInvolved> list = new LinkedList<ResourceManagerInvolved>();
 		list.add(ResourceManagerInvolved.ROOMS);
@@ -866,6 +923,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		//check that the transaction is active
 		isTransactionActive(xid);
+
+		//reset the timer as operation was performed
+		resetTimeout(xid);
 
 
 		//add the resource managers this operation will interact with
@@ -1004,6 +1064,10 @@ public class RMIMiddleware implements IMiddleware {
 
 	public void stopTimeout(int xid) throws RemoteException {
 		timeoutManager.closeTimeout(xid);
+	}
+
+	public void resetTimeout(int xid)  throws RemoteException {
+		timeoutManager.resetTimeout(xid);
 	}
     
     public void shutdown() throws RemoteException {

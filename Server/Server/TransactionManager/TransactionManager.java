@@ -198,7 +198,6 @@ public class TransactionManager {
                     } catch(RemoteException e) {
 
                     }
-                    
                 }
                 //remove the resource managers involved list
                 activeTransactionsRMs.remove(xid);

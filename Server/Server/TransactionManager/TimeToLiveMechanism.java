@@ -10,7 +10,7 @@ public class TimeToLiveMechanism extends Thread {
 
     protected int transactionId;
     protected Date latest_operation_date = new Date();
-    protected static int TIMEOUT = 1000000;
+    protected static int TIMEOUT = 20000;
 
     BlockingQueue<Message> in_queue = new LinkedBlockingQueue<Message>();
     BlockingQueue<Message> out_queue = new LinkedBlockingQueue<Message>();
@@ -33,27 +33,32 @@ public class TimeToLiveMechanism extends Thread {
                     thisThread.wait(TimeToLiveMechanism.TIMEOUT - timeBlocked);
 
                     //transaction succeeeded, close the timer
-                    if(!in_queue.isEmpty() && (in_queue.poll().getMessage() == MessageType.CLOSE_TIMER)) {
+                    MessageType mess = null;
+                    if(!in_queue.isEmpty()) {
+                        mess = in_queue.poll().getMessage();
+                    }
+
+                    //transaction closed (either aborted or committed), close the timer
+                    if(mess != null && mess == MessageType.CLOSE_TIMER) {
                         break;
                     } 
 
                     //transaction operation occured, reset the timer
-                    else if(!in_queue.isEmpty() && (in_queue.poll().getMessage() == MessageType.RESET_TIMER)) {
-                        latest_operation_date = new Date();
+                    if(mess != null && mess == MessageType.RESET_TIMER) {
+                        latest_operation_date = new Date(); 
                     } 
 
-                    //no message, transaction timed out, send message to abort
-                    else {
-                        Date currTime = new Date();
-                        timeBlocked = currTime.getTime() - latest_operation_date.getTime();
-                        // Check if the transaction has been waiting for a period greater than the timeout period 
-                        if (timeBlocked >= TimeToLiveMechanism.TIMEOUT) {
-                            //communicate to abort the transaction
-                            out_queue.add(new Message(MessageType.ABORT_TRANSACTION));
-                            break;
-                            
-                        }
-                    } 
+                    //no message, check if the transaction timed out
+                    Date currTime = new Date();
+                    timeBlocked = currTime.getTime() - latest_operation_date.getTime();
+                    // Check if the transaction has been waiting for a period greater than the timeout period 
+                    if (timeBlocked >= TimeToLiveMechanism.TIMEOUT) {
+                        //communicate to abort the transaction
+                        out_queue.add(new Message(MessageType.ABORT_TRANSACTION));
+                        break;
+                        
+                    }
+                    
                 } 
             }
         } catch (InterruptedException e) {
