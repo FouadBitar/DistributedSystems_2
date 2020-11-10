@@ -532,7 +532,7 @@ public class ResourceManager implements IResourceManager
 
 		//if there are values that were written, revert them
 		if(prev_data != null && prev_data.size() > 0) {
-			Trace.info("--- inside block1 revertPreviousData - size - " + prev_data.size());
+			// Trace.info("--- inside block1 revertPreviousData - size - " + prev_data.size());
 			for (Map.Entry<String, RMItem> entry : prev_data.entrySet()) {
 				String key = entry.getKey();
 				RMItem value = entry.getValue();

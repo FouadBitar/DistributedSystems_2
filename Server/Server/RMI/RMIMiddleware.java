@@ -260,7 +260,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock for the flight data
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_FLIGHT_DATA+flightNum, TransactionLockObject.LockType.LOCK_WRITE);
 
 			//get the right resource manager 
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -294,7 +294,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock 
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_CAR_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
 
 			//get the right resource manager 
 			IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
@@ -328,7 +328,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock 
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
 
 			//get the right resource manager 
 			IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
@@ -362,7 +362,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			//grab  read lock
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_FLIGHT_DATA+flightNum, TransactionLockObject.LockType.LOCK_WRITE);
 
 			//get the right resource manager 
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -396,7 +396,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock 
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_CAR_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
 
 			//get the right resource manager 
 			IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
@@ -431,7 +431,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock 
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
 
 			//get the right resource manager 
 			IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
@@ -460,7 +460,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			//grab  read lock
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_FLIGHT_DATA+flightNumber, TransactionLockObject.LockType.LOCK_READ);
 
 			//get the right resource manager 
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -490,7 +490,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			//grab  read lock
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_CAR_DATA+location, TransactionLockObject.LockType.LOCK_READ);
 
 			//get the right resource manager 
 			IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
@@ -519,7 +519,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			//grab  read lock
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_ROOM_DATA+location, TransactionLockObject.LockType.LOCK_READ);
 
 			//get the right resource manager 
 			IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
@@ -549,7 +549,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab read lock 
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_FLIGHT_DATA+flightNumber, TransactionLockObject.LockType.LOCK_READ);
 
 			//get the right resource manager 
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -580,7 +580,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab read lock 
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_CAR_DATA+location, TransactionLockObject.LockType.LOCK_READ);
 
 			//get the right resource manager 
 			IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
@@ -611,7 +611,7 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab read lock 
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_ROOM_DATA+location, TransactionLockObject.LockType.LOCK_READ);
 
 			//get the right resource manager 
 			IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
@@ -656,17 +656,22 @@ public class RMIMiddleware implements IMiddleware {
 		tm.addTransactionRM(xid, list);
 
 		try{
-			// grab write lock 
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
 
 			// have lock to all resource managers, now call on each to create the customer
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
 			IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
 			IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
 
+			//no need for lock for first one as it is creating a unique id, so there wont be a conflict
 			int cid = rm_f.newCustomer(xid);
+
+			// grab write lock 
+			lm.Lock(xid, RM_FLIGHT_DATA+cid, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_CAR_DATA+cid, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+cid, TransactionLockObject.LockType.LOCK_WRITE);
+
+			
+			
 			rm_c.newCustomer(xid, cid);
 			rm_r.newCustomer(xid, cid);
 
@@ -701,9 +706,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock 
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_FLIGHT_DATA+cid, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_CAR_DATA+cid, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+cid, TransactionLockObject.LockType.LOCK_WRITE);
 
 			// have lock to all resource managers, now call on each to create the customer
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -744,9 +749,9 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			// grab write lock 
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_FLIGHT_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_CAR_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
 
 			// have lock to all resource managers, now call on each to create the customer
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -788,9 +793,9 @@ public class RMIMiddleware implements IMiddleware {
 		// grab write lock 
 		try{
 			// grab read locks
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_READ);
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_READ);
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_FLIGHT_DATA+customerID, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_CAR_DATA+customerID, TransactionLockObject.LockType.LOCK_READ);
+			lm.Lock(xid, RM_ROOM_DATA+customerID, TransactionLockObject.LockType.LOCK_READ);
 
 			// have lock to all resource managers, now call on each to create the customer
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
@@ -832,7 +837,8 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			//grab  read lock
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_FLIGHT_DATA+flightNumber, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_FLIGHT_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
 
 			IResourceManager rm_f = resource_managers.get(FLIGHT_SERVER_NAME);
 
@@ -865,8 +871,9 @@ public class RMIMiddleware implements IMiddleware {
 		tm.addTransactionRM(xid, list);
 
 		try{
-			//grab  read lock
-			lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			//grab write lock
+			lm.Lock(xid, RM_CAR_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_CAR_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
 
 			IResourceManager rm_c = resource_managers.get(CAR_SERVER_NAME);
 
@@ -900,7 +907,8 @@ public class RMIMiddleware implements IMiddleware {
 
 		try{
 			//grab  read lock
-			lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
+			lm.Lock(xid, RM_ROOM_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
 
 			IResourceManager rm_r = resource_managers.get(ROOM_SERVER_NAME);
 
@@ -936,10 +944,21 @@ public class RMIMiddleware implements IMiddleware {
 		tm.addTransactionRM(xid, list);
 
 		try{
-			//grab  read lock
-			lm.Lock(xid, RM_FLIGHT_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			if(room) lm.Lock(xid, RM_ROOM_DATA, TransactionLockObject.LockType.LOCK_WRITE);
-			if(car) lm.Lock(xid, RM_CAR_DATA, TransactionLockObject.LockType.LOCK_WRITE);
+			//grab locks
+			lm.Lock(xid, RM_FLIGHT_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
+			for(String flightNumb: flightNumbers) {
+				int flightNumb_int = toInt(flightNumb);
+				lm.Lock(xid, RM_FLIGHT_DATA+flightNumb_int, TransactionLockObject.LockType.LOCK_WRITE);
+			}
+			
+			if(room) {
+				lm.Lock(xid, RM_ROOM_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
+				lm.Lock(xid, RM_ROOM_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
+			}
+			if(car) { 
+				lm.Lock(xid, RM_CAR_DATA+location, TransactionLockObject.LockType.LOCK_WRITE);
+				lm.Lock(xid, RM_CAR_DATA+customerID, TransactionLockObject.LockType.LOCK_WRITE);
+			}
 
 			
 			IResourceManager rm_r = null, rm_c = null;

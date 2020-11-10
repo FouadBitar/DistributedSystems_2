@@ -10,7 +10,7 @@ public class TimeToLiveMechanism extends Thread {
 
     protected int transactionId;
     protected Date latest_operation_date = new Date();
-    protected static int TIMEOUT = 20000;
+    protected static int TIMEOUT = 100000;
 
     BlockingQueue<Message> in_queue = new LinkedBlockingQueue<Message>();
     BlockingQueue<Message> out_queue = new LinkedBlockingQueue<Message>();
