@@ -644,6 +644,7 @@ public abstract class Client
 
 				System.out.println("Quitting client");
 				System.exit(0);
+				
 			/* case AddCars: {
 				checkArgumentsCount(5, arguments.size());
 

@@ -126,7 +126,7 @@ public class ResourceManager implements IResourceManager
 
 		// Read customer object if it exists (and read lock it)
 		Customer customer = (Customer)readData(xid, Customer.getKey(customerID));
-		RMItem cloneCustomer= (Customer)readData(xid, Customer.getKey(customerID));
+		RMItem cloneCustomer= readData(xid, Customer.getKey(customerID));
 		if (customer == null)
 		{
 			Trace.warn("RM::reserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ")  failed--customer doesn't exist");
@@ -135,7 +135,7 @@ public class ResourceManager implements IResourceManager
 
 		// Check if the item is available
 		ReservableItem item = (ReservableItem)readData(xid, key);
-		RMItem cloneItem = (ReservableItem)readData(xid, key);
+		RMItem cloneItem = readData(xid, key);
 		if (item == null)
 		{
 			Trace.warn("RM::reserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ") failed--item doesn't exist");
@@ -506,8 +506,11 @@ public class ResourceManager implements IResourceManager
 				x_map.put(key, value);
 				previousData.put(xid, x_map);
 			} else {
-				x_map.put(key, value);
-				previousData.put(xid, x_map);
+				//if there is already a previous value for the same key, keep it, its the first one from this transaction
+				if(!x_map.containsKey(key)) {
+					x_map.put(key, value);
+					previousData.put(xid, x_map);
+				}
 			}
 		}
 	}
@@ -529,6 +532,7 @@ public class ResourceManager implements IResourceManager
 
 		//if there are values that were written, revert them
 		if(prev_data != null && prev_data.size() > 0) {
+			Trace.info("--- inside block1 revertPreviousData - size - " + prev_data.size());
 			for (Map.Entry<String, RMItem> entry : prev_data.entrySet()) {
 				String key = entry.getKey();
 				RMItem value = entry.getValue();

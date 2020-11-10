@@ -192,8 +192,13 @@ public class TransactionManager {
                 }
                 //revert the values for each resource manager then remove them
                 for(IResourceManager rm : rms) {
-                    rm.revertPreviousValues(xid);
-                    rm.removePreviousValues(xid);
+                    try{
+                        rm.revertPreviousValues(xid);
+                        rm.removePreviousValues(xid);
+                    } catch(RemoteException e) {
+
+                    }
+                    
                 }
                 //remove the resource managers involved list
                 activeTransactionsRMs.remove(xid);
